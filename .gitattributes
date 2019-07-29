@@ -1,2 +1,2 @@
-resources/static/framework/* linguist-vendored
+*/resources/static/framework/* linguist-vendored
 /sys-dependencies/doc/* linguist-vendored
