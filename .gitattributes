@@ -1,2 +1,2 @@
-sys-boot/sys-page/src/main/resources/static/framework/* linguist-vendored
-sys-dependencies/doc/* linguist-vendored
+/sys-boot/sys-page/src/main/resources/static/framework/* linguist-vendored
+/sys-dependencies/doc/* linguist-vendored
