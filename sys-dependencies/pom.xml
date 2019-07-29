@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.sunys</groupId>
+	<artifactId>sys-dependencies</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<boot.version>2.1.6.RELEASE</boot.version>
+		<cloud.version>Greenwich.SR2</cloud.version>
+
+		<sys.facade.version>0.0.1-SNAPSHOT</sys.facade.version>
+		<sys.core.version>0.0.1-SNAPSHOT</sys.core.version>
+		<sys.web.version>0.0.1-SNAPSHOT</sys.web.version>
+		<sys.page.version>0.0.1-SNAPSHOT</sys.page.version>
+	</properties>
+
+	<modules>
+		<module>../sys-facade</module>
+		<module>../sys-core</module>
+		<module>../sys-web</module>
+		<module>../sys-page</module>
+	</modules>
+
+	<repositories>
+		<!-- 中央仓库 -->
+		<repository>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- spring仓库 -->
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Milestone</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.sunys</groupId>
+				<artifactId>sys-facade</artifactId>
+				<version>${sys.facade.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sunys</groupId>
+				<artifactId>sys-core</artifactId>
+				<version>${sys.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sunys</groupId>
+				<artifactId>sys-web</artifactId>
+				<version>${sys.web.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sunys</groupId>
+				<artifactId>sys-page</artifactId>
+				<version>${sys.page.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<!--
+				<artifactId>spring-boot-starter-parent</artifactId>
+				-->
+				<version>${boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

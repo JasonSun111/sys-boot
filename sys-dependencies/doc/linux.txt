@@ -1,0 +1,808 @@
+Linux命令
+
+帮助文档：
+外部命令：man 命令
+内部命令：help 命令
+
+pwd
+显示当前所在目录
+
+ls
+显示当前目录下的文件
+
+ls -lat /usr
+显示/usr文件夹下文件的详细信息（包含隐藏文件），并按时间排序
+
+ll /usr
+显示/usr文件夹下文件的详细信息（不包含隐藏文件）
+
+cd
+进入用户的home
+
+cd /usr
+进入usr目录
+
+cd ..
+返回上一级目录
+
+cd /
+返回到根目录
+
+mkdir room
+创建目录room
+
+mkdir room1 room2 room3
+创建目录room1、room2、room3
+
+mkdir -p room1/room2/room3
+创建多级目录
+
+touch abc.txt
+创建文件abc.txt
+
+>abc
+创建文件acb
+
+cp abc.txt room2/abc
+复制文件abc.txt到目录room2，并改名为abc
+
+mv room3 room0
+room3重命名为room0
+
+mv abc.txt room0/abc
+把文件abc.txt移动到room0下，并改名为abc
+
+rmdir room
+删除目录
+
+rm -rf room0
+删除room0中的所有文件
+
+cat abc
+查看abc文件的内容
+
+tac abc
+倒序查看abc文件的内容
+
+more abc
+less abc
+分页查看文件内容
+
+head install.log
+查看文件头（默认前10行）
+head -n 3 install.log
+查看文件前3行内容
+
+tail install.log
+查看文件尾（默认后10行）
+tail -n 3 install.log
+查看文件后3行内容
+tail -f /var/log/message
+监视message中的日志
+
+find /root -name install.log
+查找root目录下名称为install.log的文件
+
+wc install.log
+查看文件的行数，字数，字符数
+
+stat family
+查看文件或文件夹的属性
+
+top
+所有进程的运行情况，查看任务管理器
+
+ps -ef
+所有进程瞬时的运行情况
+
+ps -ef | more
+所有进程瞬时的运行情况，并分页显示
+
+ps -ef > abc.txt
+所有进程瞬时的运行情况，写入到文件abc.txt
+
+kill -9 pid
+杀死进程
+
+df
+查看磁盘使用情况
+
+df -h
+查看磁盘使用情况
+
+du -h | more
+查看所有文件大小，并分页显示
+
+free
+查看内存使用情况
+
+free -h
+查看内存使用情况
+
+netstat -ant
+查看当前tcp连接
+
+netstat -anu
+查看当前udp连接
+
+netstat -an | grep 8080
+查看占用8080端口的应用
+
+ifconfig
+查看ip配置
+
+ifconfig eth0 192.168.233.132
+修改eth0网卡的ip
+
+hostname
+查看主机名
+
+ping
+ping一个地址是否可以连接成功
+
+su
+切换用户
+
+who
+查看有哪些用户登陆
+
+who am i
+当前正在使用哪个用户
+
+source /etc/profile
+重新加载/etc/profile文件，配置环境变量后需要重新加载
+
+uname -a
+查看linux版本的详细信息
+
+env
+查看当前系统的环境变量
+
+chmod 777 abc.txt
+改变abc.txt文件权限，所有用户都可以可读、可写、可执行
+-rwxr--r--：表示是一个文件，当前用户可读、可写、可执行，同一组的用户只可读，其他用户只可读。
+第1位表示是目录还是文件或者快捷方式，
+2、3、4位表示当前用户是否可读、可写、可执行，
+4、5、6位表示同一个用户组的用户是否可读、可写、可执行，
+7、8、9位表示其他用户是否可读、可写、可执行。
+-：文件
+d：目录
+l：快捷方式
+r：可读，4
+w：可写，2
+x：可执行，1
+rwx 7
+rw- 6
+r-x 5
+
+chown -R 123 abc
+改变文件夹abc的所有者为123，-R递归当前文件夹和子文件夹
+
+
+centos7：systemctl status firewalld.service
+centos6：service iptables status
+查看防火墙服务的状态
+
+centos7：systemctl stop firewalld.service
+centos6：service iptables stop
+关闭防火墙服务
+
+centos7：systemctl start httpd.service
+centos6：service httpd start
+启动apache服务
+
+centos7：systemctl list-unit-files
+centos6：chkconfig
+查看所有服务的启动状态
+
+centos7：systemctl disable firewalld.service
+centos6：chkconfig iptables off
+关闭防火墙自启
+
+centos7：systemctl enable firewalld.service
+centos6：chkconfig iptables on
+打开防火墙自启
+
+centos7：systemctl list-unit-files | grep firewalld.service
+centos6：chkconfig iptables --list
+查看防火墙是否是自启
+
+systemctl start docker.service
+启动docker服务
+
+systemctl stop docker.service
+停止docker服务
+
+
+获取docker镜像加速地址
+https://dev.aliyun.com/search.html
+
+docker images
+查看docker本地的所有镜像
+
+docker pull mysql:5.7.18
+从仓库拉去镜像
+
+docker rmi mysql:5.7.18
+docker rmi IMAGE_ID
+删除mysql镜像
+
+docker save mysql:5.7.18 > /root/mysql.5.7.18.tar.gz
+导出mysql镜像
+
+docker load < /root/mysql.5.7.18.tar.gz
+导入mysql镜像
+
+docker run -it --name centos7 docker.io/centos:7 /bin/bash
+以交互的方式创建并启动容器
+-it：以交互的方式
+--name：给容器起个名字
+/bin/bash：交互方式
+
+docker run -it -v /dataVolume:/dataVolumeContainer --name centos01 centos:7 /bin/bash
+以交互的方式创建并启动容器，设置数据卷共享数据，宿主机目录：/dataVolume，docker目录：/dataVolumeContainer
+
+docker run -d --name centos7 docker.io/centos:7
+以守护进程的方式创建并启动容器
+-d：以守护进程的方式
+
+docker run -d --name mysql01 -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 mysql:5.7
+运行mysql容器
+
+docker exec -it centos7 /bin/bash
+与一个正在运行的容器交互
+
+CTRL + P,Q
+退出正在交互的容器
+
+docker attach centos7
+附加到已经运行的容器，再次进入已经运行的容器
+
+docker start centos7
+启动已经创建的容器
+
+docker stop centos7
+停止容器
+
+docker rm centos7
+删除容器
+
+docker ps -a
+查看所有容器
+
+docker logs centos7
+查看容器日志
+
+docker logs -ft --tail 5 centos7
+查看容器运行的日志，-f：查看实时的日志，-t：带上时间戳，--tail 5：只现实最新的5条，如果没有指定，则显示所有
+
+docker top centos7
+查看运行中的容器内的进程
+
+docker port centos7
+查看容器中和宿主机的端口映射情况
+
+docker diff centos7
+查看centos7容器和原来的镜像有什么不同
+
+docker inspect cenots7
+查看已经创建的容器
+
+docker安装gitlab
+
+docker pull gitlab/gitlab-ce:11.4.6-ce.0
+docker run --detach \
+	--hostname gitlab.qnmlgb.com \
+	--env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.qnmlgb.com/'; gitlab_rails['lfs_enabled'] = true;" \
+	--publish 443:443 --publish 80:80 --publish 22:22 \
+	--name gitlab \
+	--restart always \
+	--volume /srv/gitlab/config:/usr/etc/gitlab \
+	--volume /srv/gitlab/logs:/usr/var/log/gitlab \
+	--volume /srv/gitlab/data:/usr/var/opt/gitlab \
+	gitlab/gitlab-ce:11.4.6-ce.0
+
+docker run --detach \
+	--hostname gitlab.qnmlgb.com \
+	--publish 80:80 --publish 2333:22 \
+	--name gitlab \
+	--restart always \
+	--volume /srv/gitlab/config:/etc/gitlab \
+	--volume /srv/gitlab/logs:/var/log/gitlab \
+	--volume /srv/gitlab/data:/var/opt/gitlab \
+	gitlab/gitlab-ce:11.8.1-ce.0
+
+docker安装mysql
+
+docker pull mysql:5.7
+docker run --name mysql01 -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:5.7
+
+docker exec -it mysql01 /bin/bash
+docker exec -it mysql01 mysql -u root -p
+
+docker安装redis
+
+docker pull redis:5
+docker run --name redis01 -p 6379:6379 -v $PWD/data:/data -d redis:5 redis-server
+
+docker exec -it redis01 /bin/bash
+docker exec -it redis01 redis-cli
+
+docker安装rabbitmq
+
+docker pull rabbitmq:3.7.12-management
+docker run -d --name rabbitmq01 \
+	-p 15672:15672 -p 5672:5672 -p 25672:25672 -p 61613:61613 -p 1883:1883 \
+	rabbitmq:3.7.12-management
+docker run -d --name rabbit -p 15672:15672 -p 5672:5672 -p 25672:25672 -p 61613:61613 -p 1883:1883 rabbitmq:management
+15672：控制台端口号
+5672：应用访问端口号
+
+
+修改ssh默认端口
+第一步、修改/etc/ssh/sshd_config
+vim /etc/ssh/sshd_config
+#Port 22         //这行去掉#号
+Port 3600      //将端口号改成3600
+第二步：在使用SELinux的系统中，需要修改SELinux
+使用以下命令查看当前SElinux允许的ssh端口：
+semanage port -l | grep ssh
+添加3600端口到SELinux
+semanage port -a -t ssh_port_t -p tcp 3600
+查看新的端口：
+semanage port -l | grep ssh
+注意：semanage可以用yum install policycoreutils-python安装。
+第三步：重启ssh服务
+systemctl restart sshd.service
+
+gzip --fast install.log
+gzip --bast install.log
+gzip -d install.log.gz
+gzip压缩和解压
+
+bzip2 -1 install.log
+bzip2 -9 install.log
+bzip2 -d install.log.bz2
+bzip2压缩和解压
+
+tar -czvf family.tar.gz family
+tar -xzvf family.tar.gz -C demo
+压缩和解压文件夹
+-c：压缩
+-x：解压
+-z：gzip
+-j：bzip2
+-v：显示进度
+-f：使用文件名
+-C：解压到demo
+
+centos 安装deb安装包：
+下载alien，可以解压deb文件
+http://ftp.de.debian.org/debian/pool/main/a/alien/
+tar -xf alien_8.92.tar.gz
+perl Makefile.PL
+make
+make install
+yum -y install rpm-build
+
+
+安装网易云音乐：
+wget http://ftp.de.debian.org/debian/pool/main/a/alien/alien_8.95.tar.xz
+mkdir netease-cloud
+cd netease-cloud
+ar -vx netease-cloud-music_1.1.0_amd64_ubuntu.deb
+xz -dk data.tar.xz
+tar -xf data.tar
+cp -r usr/* /usr/
+yum install libXScrnSaver.x86_64
+安装新的gcc：
+wget http://mirrors.hust.edu.cn/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
+tar -xf gcc-8.3.0.tar.gz
+cd gcc-8.3.0/
+./contrib/download_prerequisites
+./configure --prefix=/usr --enable-languages=c,c++ --disable-multilib
+make -j4  #等50分钟左右
+make install
+重新启动网易云
+
+
+安装lantern
+解压lantern-installer-64-bit.deb
+cp -r usr/* /usr/
+yum install libXScrnSaver*
+yum install libappindicator-gtk3
+
+centos7耳机没有声音
+在终端中输入alsamixer，进入声卡配置界面，
+1、按F6，选择声卡：HDA Intel PCH
+2、按F3，选择Playback
+3、按左右键切换到Headphone，按SHIFT+m，打开选项
+4、如果没有Headphone选项，选择HP/Speaker和HP/Speaker Auto选项打开
+耳机就有声音了
+
+
+
+linux无法播放视频
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+yum install vlc
+
+
+centos安装nvidia显卡驱动
+在启动时中关闭bios中的secure boot选项
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+安装检测显卡
+yum install nvidia-detect
+查看显卡硬件版本信息
+nvidia-detect -v
+
+yum install kernel-devel
+备份当前的initramfs文件
+sudo mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak
+禁用默认的nouveau
+vim /usr/lib/modprobe.d/dist-blacklist.conf，在文件中加入：
+blacklist nouveau
+options nouveau modeset=0
+重建initramfs文件
+sudo dracut -v /boot/initramfs-$(uname -r).img $(uname -r)
+改成默认进入命令行模式，在命令行模式下安装显卡驱动（安装完成后设置systemctl set-default graphical.target进入图形界面模式）
+systemctl set-default multi-user.target
+reboot
+安装显卡驱动：
+sh NVIDIA-Linux-x86_64-xxx.run --kernel-source-path=/usr/src/kernels/$(uname -r)
+
+安装过程中的提示:
+如果有“nvidia-installer was forced toguess the X library path ‘/usr/lib’and X module path …”,继续并点击OK.
+如果有“The CC version check failed”点击“ignore CC version check”.
+如果有问你关于32-bit libraries,选择yes,并安装它们.
+如果问你关于“running nvidia -xconfig to updateyour X configuration file”,选择no.
+运行 nvidia-smi 来查看已安装的GPU.
+
+卸载nvidia显卡驱动：
+sh NVIDIA-Linux-x86_64-xxx.run --uninstall
+
+
+
+
+
+安装mysqlworkbench
+wget https://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-workbench-community-8.0.15-1.el7.x86_64.rpm
+yum install libzip proj.x86_64
+rpm -ivh mysql-workbench-community-8.0.15-1.el7.x86_64.rpm
+
+
+
+Python-3.7.4安装
+yum groupinstall "Development tools"
+yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel
+wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+tar xJf Python-3.7.4.tar.xz
+cd Python-3.7.4/
+./configure --prefix=/usr/local/software/python-3.7.4 --enable-shared --enable-universalsdk
+make
+make install
+vim /etc/ld.so.conf.d/python3.conf
+在python3.conf中添加内容：/usr/local/software/python-3.7.4/lib
+ln /usr/local/software/python-3.7.4/bin/python3.7 /usr/bin/python3
+ln /usr/local/software/python-3.7.4/bin/pip3 /usr/bin/pip3
+
+
+
+
+
+
+
+
+关闭hot-corner
+yum -y install gnome-shell-extension-no-hot-corner
+
+
+
+
+logout
+注销
+halt -p
+关机
+reboot
+重启
+
+yum -y install keepalived
+安装keepalived服务
+
+yum -y install mysql-server
+安装mysql服务
+
+yum -y install docker
+安装docker
+
+yum list installed | grep docker
+查看是否安装docker
+
+yum remove -y docker.x86_64
+yum remove -y docker-client.x86_64
+yum remove -y docker-common.x86_64
+
+
+rpm -ql keepalived
+查看keepalived服务的安装情况
+
+rpm -qa | grep mysql
+查看是否用rpm安装了mysql
+
+
+
+设置linux静态ip：
+进入这个文件夹
+cd /etc/sysconfig/network-scripts
+用vim编辑器编辑文件：ifcfg-eth0
+vim ifcfg-eth0
+
+BOOTPROTO="static"
+
+IPADDR="192.168.24.20"
+NETMASK="255.255.255.0"
+GATEWAY="192.168.24.1"
+DNS1="8.8.8.8"
+DNS2="8.8.4.4"
+
+
+
+修改网卡名称
+cd /etc/udev/rules.d
+vim 70-persistent-net.rules
+
+
+
+
+vim book
+i：向前一个字符插入
+I：到行首插入
+a：向后一个字符插入
+A：到行尾插入
+o：到下一行插入
+O：到上一行插入
+r：替换当前字符
+R：开启替换模式
+v：选择字符
+V：选择整行字符
+ctrl+v：选择整块字符
+x：删除光标后一个字符
+D：删除光标后的整行字符
+dd：删除整行字符
+dG：删除光标后的所有字符
+u：撤销
+ctrl+r：恢复
+:set nu：显示行号
+:132：跳转到132行
+G：跳转到最后一行
+gg：跳转到第一行
+:wq：写入并退出
+:q!：不保存退出
+/abc：搜索abc，n是下一个
+
+
+
+构建DockerFile：
+docker build -f Dockerfile -t mycentos:1 .
+-f：指定根据那个文件解析Dockerfile
+-t：指定生成镜像的名称和版本
+.：在当前路径表示
+
+Dockerfile示例：
+
+FROM centos:7
+ENV MYPATH /usr/local
+WORKDIR $MYPATH
+RUN yum install -y vim
+RUN yum install -y net-tools
+EXPOSE 80
+CMD echo $MYPATH
+CMD /bin/bash
+
+Dockerfile解析：
+FROM
+MAINTAINER
+WORKDIR
+RUN
+ENV
+EXPOSE
+CMD
+ADD
+COPY
+VOLUME
+ENYRYPOINT
+ONBUILD
+
+redis命令：
+auth 123：输入密码
+shutdown：关闭redis
+save：将内存中的数据存到硬盘，阻塞
+bgsave：将内存中的数据存到硬盘，不阻塞
+select 2：切换到2库，连接redis默认是1库，共16个库
+flushdb：清空当前数据库中的键值对
+flushall：清空所有数据库中的键值对
+keys *：查看数据库中所有key
+exists key1：判断key1是否存在
+move k1 2：将k2键值对移动到2库
+expire k1 3：设置k1的过期时间为3秒
+ttl k1：查看k1的过期时间，-1为永不过期，-2为已经过期，time to live
+type k1：查看k1对应的数据类型
+del k1：删除k1的键值对
+
+string类型
+set k1 v1：设置键值对
+get k1：获取k1对应的值
+append k1 123：在k1的值基础上追加
+strlen k1：返回当前字符串的长度
+incr k1：在当前值的基础上加1，当前值必须是数字
+decr k1：在当前值的基础上减1，当前值必须是数字
+incrby k1 3：在当前值的基础上加3，当前值必须是数字
+decrby k1 3：在当前值的基础上减3，当前值必须是数字
+getrange k1 0 -1：返回指定区域的值，-1表示最后一个
+setrange k1 0 abc：将第0个开始设置成abc
+setex k1 8 v1：设置键值对，并设置k1的过期时间
+setnx k1 v1：如果没有k1，就设置键值对
+mset k1 v1 k2 v1：一次设置多个键值对
+mget k1 k2：一次获取多个键值对
+msetnx k2 v2 k3 v3：一次设置多个键值对，如果有一个key已存在，所以都不能设置成功
+
+list类型
+lpush k1 a b c：从左边插入列表
+rpush k1 d e f：从右边插入列表
+lrange k1 0 -1：从左边获取列表
+lpop k1：删除并获取左边的一个元素
+rpop k1：删除并获取右边的一个元素
+lindex k1：按脚标获取列表中的元素
+llen k1：获取列表的长度
+lrem k1 2 a：删除列表中的2个a
+ltrim k1 0 3：截取0到3的元素，重新赋值给原来的列表
+rpoplpush k1 k2：将k1的最后一个元素移动到k2的第一个元素
+lset k1 0 1：将第0个元素的值设置成1
+
+set类型
+sadd k1 a b b c：添加多个元素，重复的元素添加不进去
+smembers k1：查看所有的元素
+sismembers k1 d：判断当前值在集合中是否存在
+scard k1：获取集合中有多少个元素
+srem k1 a：删除集合中的元素
+srandmember k1 2：从集合中随机获取2个元素
+spop k1：随机删除并获取一个元素
+sdiff k1 k2：获取k1中有，k2中没有的元素
+sinter k1 k2：获取k1中有，k2中也有的元素
+sunion k1 k2：获取k1和k2中的所有元素
+
+hash类型
+hset k1 key1 value1：设置hash的键值对
+hget k1 key1：获取hash的key1对应的值
+hmset k1 key1 value1 key1 value2：给hash设置多个键值对
+hmget k1 key1 key2：获取hash的多个键值对
+hgetall k1：获取一个hash的所有键值对
+hdel k1 key1：删除hash中的键值对
+hlen k1：获取hash中有多少键值对
+hexists k1 key1：判断hash中有没有当前的键
+hkeys k1：获取hash的所有键
+hvals k2：获取hash的所有值
+hincrby k1 key3 2：给hash的值加2，值必须是数字
+hsetnx k1 key1 value1：如果key1在hash中不存在，就设置键值对
+
+zset类型
+zadd zset01 60 v1 70 v2 80 v3 90 v4 100 v5：给集合添加元素
+zrange zset01 0 -1：获取集合中所以元素
+zrange zset01 0 -1 withscores：获取集合中的元素和对应的score
+zrangebyscore zset01 60 80：获取对应分数范围的元素
+zrangebyscore zset01 (60 (80：获取对应分数范围的元素，“(”表示不包含当前score
+zrem zset01 v5：删除集合中的元素
+zcard zset01：获取集合中有多少元素
+zcount zset01 60 80：获取对应成绩下有多少个元素
+zrank zset01 v4：获取当前元素的下标值
+zrevrank zset01 v4：逆序获取当前元素的下标值
+zscore zset01 v4：获取当前元素的score
+zrevrange zset01 0 -1：逆序获取集合中的所有元素
+zrevrangebyscore zset01 80 60：逆序获取对应分数范围的元素
+
+multi：开启事务
+exec：执行事务中的操作
+discard：放弃事务
+watch key1：监控key1，可以是多个，事务执行之前修改过被监控的key，事务中的操作都不会执行
+unwatch：取消监控所有key
+
+redis-check-aof --fix appendonly.aof：修复aof
+redis-check-dump --fix dump.rdb：修复rdb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USBWriter写入u盘恢复：
+
+win + R -> cmd
+
+DiskPart
+
+
+Microsoft DiskPart 版本 10.0.17134.1
+
+Copyright (C) Microsoft Corporation.
+在计算机上: DESKTOP-P7VURQN
+
+DISKPART> list disk
+
+  磁盘 ###  状态           大小     可用     Dyn  Gpt
+  --------  -------------  -------  -------  ---  ---
+  磁盘 0    联机              931 GB      0 B        *
+  磁盘 1    联机              238 GB  1024 KB        *
+  磁盘 2    联机               29 GB    29 GB
+
+DISKPART> select disk 2
+
+磁盘 2 现在是所选磁盘。
+
+DISKPART> clean
+
+DiskPart 遇到错误: 设备未就绪。
+有关详细信息，请参阅系统事件日志。
+
+DISKPART> clean
+
+DiskPart 成功地清除了磁盘。
+
+DISKPART> create partition primary
+
+DiskPart 成功地创建了指定分区。
+
+DISKPART> select partition 1
+
+分区 1 现在是所选分区。
+
+DISKPART> active
+
+DiskPart 将当前分区标为活动。
+
+DISKPART> format fs=ntfs quick
+
+  100 百分比已完成
+
+DiskPart 成功格式化该卷。
+
+DISKPART>
+
+
+
+
+

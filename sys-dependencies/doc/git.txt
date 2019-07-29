@@ -1,0 +1,189 @@
+
+1、最新git源码下载地址：
+https://github.com/git/git/releases
+https://www.kernel.org/pub/software/scm/git/
+可以手动下载下来在上传到服务器上面
+2 移除旧版本git
+centos自带Git，7.x版本自带git 1.8.3.1（应该是，也可能不是），
+安装新版本之前需要使用yum remove git卸载（安装后卸载也可以）。
+
+3 删除原来的版本
+git --version    ## 查看自带的版本
+yum remove git   ## 移除原来的版本
+
+4 安装需要的软件包
+yum -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel gcc-c++ perl-ExtUtils-MakeMaker
+
+yum -y install zlib-devel perl-ExtUtils-MakeMaker asciidoc xmlto openssl-devel
+
+yum install -y gcc glibc
+
+yum install wget
+
+5 下载&安装
+cd /usr/local
+wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.18.0.tar.gz
+
+6 解压
+tar xf git-2.18.0.tar.gz
+
+7 配置编译安装
+cd git-2.18.0
+./configure --prefix=/usr/local/git ##配置目录
+make
+make install
+
+8 加入环境变量
+echo "export PATH=$PATH:/usr/local/git/bin" >> /etc/profile
+source /etc/profile
+
+git --version
+
+
+
+----------------------------------------------------
+
+本地库：git本地仓库，commit暂存区的文件到本地库
+暂存区：add修改后的文件后在暂存区
+工作区：修改文件保存后在工作区
+
+git使用
+1、设置全局参数
+git config --global user.name hhqnmlgb
+git config --global user.email 924190236@qq.com
+
+查看全局参数
+git config --list
+
+2、初始化git仓库
+git init
+
+3、新建文件添加到仓库
+git add 文件名
+
+4、把文件提交到仓库
+git commit 文件名
+
+5、查看当前仓库是否有修改的文件或需要提交的文件
+git status
+
+6、查看文件的修改内容
+git diff 文件名
+
+7、查看仓库的操作历史记录
+git log
+git log --pretty=oneline
+git log --graph
+
+8、回到上一次提交的版本
+git reset --hard HEAD^
+
+9、回到上几次提交的版本
+git reset --hard HEAD~3
+
+10、根据commit id回到指定版本
+git reset --hard commitid
+
+git reset --soft commitid
+只移动本地库的head指针，会出现没有commit的文件
+
+git reset --mixed commitid
+移动本地库和暂存区的head指针，会出现没有add的文件
+
+11、撤销到最近一次git add或者git commit修改的文件
+git checkout -- 文件名
+
+12、删除最近一次暂存的git add的文件
+git reset HEAD 文件名
+
+13、生成密钥
+ssh-keygen -t rsa -C "924190236@qq.com"
+
+14、添加远程仓库
+git remote add origin git@github.com:hhqnmlgb/testit.git
+
+15、本地仓库的master分支推送到远程仓库
+git push -u origin master
+
+16、克隆远程仓库的代码到本地
+git clone git@github.com:hhqnmlgb/testgit.git
+
+17、创建分支并切换到当前分支
+git checkout -b dev
+
+18、创建分支
+git branch dev
+
+19、切换分支
+git checkout dev
+
+20、查看当前分支
+git branch
+
+21、将dev分支合并到当前分支
+git merge dev
+
+22、删除dev分支
+git branch -d dev
+
+23、强制删除没有合并的dev分支
+git branch -D dev
+
+24、删除远程仓库的dev
+git push origin --delete dev
+
+25、删除远程仓库为1.2的tag
+git push origin --delete tag 1.2
+
+
+撤销修改
+git reset --hard 
+git clean -xdf 
+git checkout -- .
+
+
+
+查看当前代理设置
+git config --global http.proxy
+
+设置当前代理为
+http://127.0.0.1:1080 或 socket5://127.0.0.1:1080
+
+git config --global http.proxy 'http://127.0.0.1:1080'
+git config --global https.proxy 'http://127.0.0.1:1080'
+git config --global http.proxy 'socks5://127.0.0.1:1080'
+git config --global https.proxy 'socks5://127.0.0.1:1080'
+
+删除代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+
+gitlab安装
+
+安装依赖的库，设置防火墙规则
+yum install -y curl policycoreutils-python openssh-server
+systemctl enable sshd
+systemctl start sshd
+firewall-cmd --permanent --add-service=http
+systemctl reload firewalld
+
+yum -y install postfix
+systemctl enable postfix
+systemctl start postfix
+
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash
+EXTERNAL_URL="http://gitlab.example.com" yum install -y gitlab-ce
+
+配置并重启gitlab
+gitlab-ctl reconfigure
+gitlab-ctl restart
+
+禁止gitlab开机自启
+systemctl disable gitlab-runsvdir.service
+
+
+
+
+
+

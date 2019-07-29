@@ -1,0 +1,80 @@
+.custom-control-label{
+	font-size:1rem;
+}
+/*头像大小*/
+img.rounded-circle{
+	width:50px;
+	height:50px;
+}
+/*标题右边的按钮*/
+.head-menu{
+	margin-top:20px;
+}
+.head-menu .form-inline{
+	float:right;
+}
+.breadcrumb .breadcrumb-item:last-child span{
+	font-weight:700;
+}
+/*页脚的公司，软件版本信息*/
+.footer .company{
+	float:left;
+}
+.footer .version-info{
+	float: right;
+}
+/*图标*/
+.thumb{
+	width:30px;
+	height:30px;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	line-height:30px;
+}
+.thumb-network_copper{
+	background-image: url("../img/network-lan.png");
+}
+.thumb-network_fiber{
+	background-image: url("../img/network-lan.png");
+}
+.thumb-lan,.thumb-LAN{
+	background-image: url("../img/network-lan.png");
+}
+.thumb-wan,.thumb-WAN{
+	background-image: url("../img/network-wan.png");
+}
+.thumb-hdmi,.thumb-HDMI{
+	background-image: url("../img/hdmi.png");
+}
+.thumb-VA4HDMI{
+	background-image: url("../img/hdmi.png");
+}
+.thumb-VA2HDMI{
+	background-image: url("../img/hdmi.png");
+}
+.thumb-VA4HDMI.active{
+	background-image: url("../img/hdmi-active.png");
+}
+.thumb-VA2HDMI.active{
+	background-image: url("../img/hdmi-active.png");
+}
+.thumb-wifi,.thumb-WIFI{
+	background-image: url("../img/wifi.png");
+}
+.thumb-CA16WIFI{
+	background-image: url("../img/ca16wifi.png");
+}
+.thumb-CA16WIFI.active{
+	background-image: url("../img/ca16wifi-active.png");
+}
+.thumb-phone,.thumb-PHONE{
+	background-image: url("../img/phone.png");
+}
+
+.modal-content{
+	border:0px;
+}
+
+.text-label{
+	font-weight: 700;
+}
