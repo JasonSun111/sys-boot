@@ -29,6 +29,7 @@
 		<module>../sys-facade</module>
 		<module>../sys-core</module>
 		<module>../sys-web</module>
+		<module>../sys-security</module>
 		<module>../sys-page</module>
 	</modules>
 
