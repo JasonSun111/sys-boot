@@ -14,6 +14,7 @@ modal.show({
 	},
 	onCreate:function(){},
 	onShow:function(){},
+	onHide:function(){},
 	onOk:function(){},
 	onClose:function(){}
 });
@@ -35,6 +36,11 @@ define("modal",function(require, exports, module) {
 			if(isCreate && option.onCreate){
 				option.onCreate();
 			}
+			if(option.onHide){
+				$modal.off("hide.bs.modal").on("hide.bs.modal",function(){
+					option.onHide();
+				});
+			}
 			if(option.onOk){
 				$modal.find(".btn-ok").off("click");
 				$modal.find(".btn-ok").click(function(){
@@ -45,7 +51,9 @@ define("modal",function(require, exports, module) {
 			}
 			if(option.onClose){
 				$modal.find(".btn-close").off("click");
-				$modal.find(".btn-close").click(option.onClose);
+				$modal.find(".btn-close").click(function(){
+					option.onClose();
+				});
 			}
 		}
 		

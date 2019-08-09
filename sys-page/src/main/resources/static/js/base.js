@@ -110,8 +110,8 @@ define("base",function(require, exports, module){
 	/**
 	 * 国际化模板过滤器
 	 * 使用：
-	 * 1、"i18nKey" | i18n
-	 * 2、"i18nKey" | i18n arr
+	 * 1、{{"i18nKey" | i18n}}
+	 * 2、{{"i18nKey" | i18n arr}}
 	 */
 	template.defaults.imports.i18n = function(msgCode,arr){
 		if(arr == null){
@@ -527,7 +527,7 @@ define("base",function(require, exports, module){
 			requestOption.method = "GET";
 		}
 		requestOption.url = this.contextPath() + "/cmn/service/" + (requestOption.requestType == "json" ? "json/" : "param/")
-			+ requestOption.serviceName + "/" + requestOption.methodName + ".json";
+			+ requestOption.serviceName + "/" + requestOption.methodName;
 		return this.ajax(requestOption);
 	}
 	

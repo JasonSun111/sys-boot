@@ -11,11 +11,11 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class SpringContextHelper implements ApplicationContextAware {
 
-	private static ApplicationContext context;
+	private static ApplicationContext applicationContext;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		context = applicationContext;
+		SpringContextHelper.applicationContext = applicationContext;
 	}
 
 	/**
@@ -23,6 +23,6 @@ public class SpringContextHelper implements ApplicationContextAware {
 	 * @return
 	 */
 	public static ApplicationContext getApplicationContext() {
-		return context;
+		return applicationContext;
 	}
 }
