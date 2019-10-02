@@ -406,7 +406,7 @@ tar -xf gcc-8.3.0.tar.gz
 cd gcc-8.3.0/
 ./contrib/download_prerequisites
 ./configure --prefix=/usr --enable-languages=c,c++ --disable-multilib
-make -j4  #等50分钟左右
+make -j4  #使用4线程编译gcc，等50分钟左右
 make install
 重新启动网易云
 
@@ -416,6 +416,35 @@ make install
 cp -r usr/* /usr/
 yum install libXScrnSaver*
 yum install libappindicator-gtk3
+
+
+
+
+centos7使用gedit打开gbk编码的文件中文乱码问题
+1、查看关于gedit的名称空间配置项
+gsettings list-schemas | grep gedit
+2、查看gedit编码名称空间配置项
+gsettings list-keys org.gnome.gedit.preferences.encodings
+3、修改编码配置里面的candidate-encodings的值，打开文件时自动尝试以下几种编码方式
+gsettings set org.gnome.gedit.preferences.encodings candidate-encodings "['CURRENT', 'UTF-8', 'GBK', 'GB2312', 'GB18030', 'BIG5', 'UTF-16']"
+
+
+
+安装libreoffice
+1、卸载原来的libreoffice：yum remove libreoffice-*
+2、下载安装包：
+http://mirrors.ustc.edu.cn/tdf/libreoffice/stable，找到最新稳定版的下载包：
+LibreOffice_6.2.7_Linux_x86-64_rpm.tar.gz
+LibreOffice_6.2.7_Linux_x86-64_rpm_sdk.tar.gz
+LibreOffice_6.2.7_Linux_x86-64_rpm_langpack_zh-CN.tar.gz
+3、解压三个压缩包
+tar -xf LibreOffice_6.2.7_Linux_x86-64_rpm.tar.gz
+tar -xf LibreOffice_6.2.7_Linux_x86-64_rpm_sdk.tar.gz
+tar -xf LibreOffice_6.2.7_Linux_x86-64_rpm_langpack_zh-CN.tar.gz
+4、进入解压后的RPMS文件夹中，安装rpm包
+yum localinstall *.rpm
+
+
 
 centos7耳机没有声音
 在终端中输入alsamixer，进入声卡配置界面，
