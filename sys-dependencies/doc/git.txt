@@ -136,6 +136,28 @@ git push origin --delete dev
 git push origin --delete tag 1.2
 
 
+
+git创建和应用补丁
+创建：
+创建commit id开始，前一次提交的补丁
+git format-patch (commit id) -n
+git format-patch 3e444f99ffd42d73da77afdbf498b2b19c3bb854 -1
+创建两次提交之间的补丁
+git format-patch  (commit id)..(commit id)
+git format-patch  2a2fb4539925bfa4a141fe492d9828d030f7c8a8..89aebfcc73bdac8054be1a242598610d8ed5f3c8
+
+应用：
+检查是否可以应用补丁
+git apply --check xxx.patch
+应用补丁
+git apply xxx.patch
+应用补丁
+git am xxx.patch
+解决补丁的冲突
+git apply --reject xxx.patch
+
+
+
 撤销修改
 git reset --hard 
 git clean -xdf 
