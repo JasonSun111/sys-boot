@@ -16,7 +16,7 @@ import com.sunys.facade.bean.DapContext;
  */
 public class ContextHelper {
 
-	private static ThreadLocal<HttpServletRequest> requestLocal = new ThreadLocal<>();
+	private static final ThreadLocal<HttpServletRequest> requestLocal = new ThreadLocal<>();
 
 	private ContextHelper() {
 	}
