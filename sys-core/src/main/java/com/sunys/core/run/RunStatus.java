@@ -1,6 +1,6 @@
-package com.sunys.core.runtime;
+package com.sunys.core.run;
 
-public enum RuntimeStatus {
+public enum RunStatus {
 
 	error,
 	idle,

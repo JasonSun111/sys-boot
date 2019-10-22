@@ -17,7 +17,6 @@ public abstract class AbstractBean implements Serializable {
 	private String createBy;
 	private Date updateOn;
 	private String updateBy;
-	private Boolean sealed;
 
 	public Long getPkid() {
 		return pkid;
@@ -57,14 +56,6 @@ public abstract class AbstractBean implements Serializable {
 
 	public void setUpdateBy(String updateBy) {
 		this.updateBy = updateBy;
-	}
-
-	public Boolean getSealed() {
-		return sealed;
-	}
-
-	public void setSealed(Boolean sealed) {
-		this.sealed = sealed;
 	}
 
 	@Override

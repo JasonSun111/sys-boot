@@ -105,7 +105,7 @@ public class ServiceInvoke {
 			obj = PageUtils.getPageParam(paramValue);
 		}else{
 			if(paramType instanceof Class){
-				Class clazz = (Class) paramType;
+				Class<?> clazz = (Class<?>) paramType;
 				//请求参数的字符串转换成方法参数需要基本数据类型
 				obj = VariantHelper.parseValue(paramValue, clazz);
 			}else{
