@@ -1,6 +1,6 @@
 package com.sunys.core.run;
 
-public interface RunFactory {
+public interface RunFactory<T extends Run> {
 
-	Run getInstance() throws Exception;
+	T getInstance() throws Exception;
 }

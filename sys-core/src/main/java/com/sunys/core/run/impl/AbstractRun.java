@@ -1,5 +1,6 @@
 package com.sunys.core.run.impl;
 
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -8,6 +9,8 @@ import com.sunys.core.run.RunStatus;
 
 public abstract class AbstractRun implements Run {
 
+	private static final LongAdder longAdder = new LongAdder();
+	
 	protected Long id;
 	
 	protected final Lock lock = new ReentrantLock();
@@ -17,6 +20,11 @@ public abstract class AbstractRun implements Run {
 	protected Run parent;
 	
 	protected Long runDuration;
+
+	public AbstractRun() {
+		longAdder.increment();
+		this.id = longAdder.sum();
+	}
 
 	public Long getId() {
 		return id;
