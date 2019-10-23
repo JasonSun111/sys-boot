@@ -1,24 +1,30 @@
 package com.sunys.core.run;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RunContext {
 
-	private static final Map<Long, RootGroupRun<Run>> rootGroupRunMap = new HashMap<>();
+	private static final ThreadLocal<Run> runThreadLocal = new ThreadLocal<>();
 	
-	public static <T> T getRun() {
-		
-		return null;
+	private static final Map<Long, RootGroupRun<Run>> rootGroupRunMap = new ConcurrentHashMap<>();
+	
+	public void setRun(Run run) {
+		runThreadLocal.set(run);
 	}
 	
-	public static <T extends Run> T getParents(Run run, Class<T> clazz) {
-		
-		return null;
+	public void removeRun() {
+		runThreadLocal.remove();
 	}
 	
-	public static RootGroupRun<Run> getRoot(Long id) {
-		RootGroupRun<Run> rootGroupRun = rootGroupRunMap.get(id);
+	public static Run getRun(Long rootId, Long id) {
+		RootGroupRun<Run> rootGroupRun = rootGroupRunMap.get(rootId);
+		Run run = rootGroupRun.runMap().get(id);
+		return run;
+	}
+	
+	public static RootGroupRun<Run> getRoot(Long rootId) {
+		RootGroupRun<Run> rootGroupRun = rootGroupRunMap.get(rootId);
 		return rootGroupRun;
 	}
 }

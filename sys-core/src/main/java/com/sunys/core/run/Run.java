@@ -1,15 +1,26 @@
 package com.sunys.core.run;
 
-public interface Run extends Runnable {
+import java.util.concurrent.Callable;
+
+public interface Run extends Callable<RunStatus> {
 
 	RunStatus getStatus();
 	
-	Run getParent();
+	GroupRun<Run> getParent();
+	
+	<T> T parents(Class<? extends Run> clazz);
+	
+	RootGroupRun<Run> getRoot();
 	
 	void init();
 	
-	@Override
 	void run();
+	
+	@Override
+	default RunStatus call() throws Exception {
+		run();
+		return getStatus();
+	}
 	
 	void clean();
 	
