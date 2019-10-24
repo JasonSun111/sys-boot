@@ -13,21 +13,36 @@ public abstract class AbstractRun implements Run {
 
 	private static final LongAdder longAdder = new LongAdder();
 	
+	private Run proxy;
+	
 	protected Long id;
 	
 	protected final Lock lock = new ReentrantLock();
 	
 	protected volatile RunStatus status;
 	
-	protected GroupRun<Run> parent;
+	protected GroupRun<? extends Run> parent;
 	
-	protected RootGroupRun<Run> root;
+	protected RootGroupRun<? extends Run> root;
 	
 	protected Long runDuration;
 
 	public AbstractRun() {
 		longAdder.increment();
 		this.id = longAdder.sum();
+	}
+
+	@Override
+	public Run getProxy() {
+		if (proxy != null) {
+			return proxy;
+		}
+		return this;
+	}
+
+	@Override
+	public void setProxy(Run proxy) {
+		this.proxy = proxy;
 	}
 
 	@Override
@@ -51,16 +66,16 @@ public abstract class AbstractRun implements Run {
 	}
 
 	@Override
-	public GroupRun<Run> getParent() {
+	public GroupRun<? extends Run> getParent() {
 		return parent;
 	}
 
-	public void setParent(GroupRun<Run> parent) {
+	public void setParent(GroupRun<? extends Run> parent) {
 		this.parent = parent;
 	}
 	
 	@Override
-	public RootGroupRun<Run> getRoot() {
+	public RootGroupRun<? extends Run> getRoot() {
 		return root;
 	}
 	

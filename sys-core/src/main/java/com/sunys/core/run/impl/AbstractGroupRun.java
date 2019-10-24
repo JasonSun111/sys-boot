@@ -39,6 +39,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			parallelRun();
 			break;
 		case event:
+			eventRun();
 			break;
 		}
 		if (RunStatus.running.equals(status)) {
@@ -46,7 +47,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		}
 	}
 
-	private void serialRun() {
+	protected void serialRun() {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
 			if (RunStatus.running.equals(status)) {
@@ -60,7 +61,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		}
 	}
 
-	private void parallelRun() {
+	protected void parallelRun() {
 		List<T> runs = getRuns();
 		ExecutorService pool = Executors.newFixedThreadPool(runs.size());
 		try {
@@ -79,6 +80,10 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		shutdown(pool);
+	}
+
+	private void shutdown(ExecutorService pool) {
 		pool.shutdown();
 		try {
 			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
@@ -89,6 +94,14 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			pool.shutdownNow();
 			Thread.currentThread().interrupt();
 		}
+	}
+
+	protected void eventRun() {
+		
+	}
+
+	public void eventRun(int index) {
+		
 	}
 
 	@Override

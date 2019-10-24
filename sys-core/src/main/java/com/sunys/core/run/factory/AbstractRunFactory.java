@@ -15,6 +15,7 @@ public abstract class AbstractRunFactory<T extends Run> implements RunFactory<T>
 	public T getInstance() throws Exception {
 		T run = createRun();
 		T runProxy = getProxy(run);
+		run.setProxy(runProxy);
 		return runProxy;
 	}
 

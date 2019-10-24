@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface RootGroupRun<T extends Run> extends GroupRun<T> {
 
-	Map<Long, T> runMap();
+	Map<Long, Run> runMap();
 }

@@ -4,13 +4,17 @@ import java.util.concurrent.Callable;
 
 public interface Run extends Callable<RunStatus> {
 
-	RunStatus getStatus();
+	Run getProxy();
 	
-	GroupRun<Run> getParent();
+	void setProxy(Run proxy);
+	
+	RunStatus getStatus();
 	
 	<T> T parents(Class<? extends Run> clazz);
 	
-	RootGroupRun<Run> getRoot();
+	GroupRun<? extends Run> getParent();
+	
+	RootGroupRun<? extends Run> getRoot();
 	
 	void init();
 	
@@ -18,7 +22,12 @@ public interface Run extends Callable<RunStatus> {
 	
 	@Override
 	default RunStatus call() throws Exception {
-		run();
+		Run run = getProxy();
+		if (run != null) {
+			run.run();
+		} else {
+			run();
+		}
 		return getStatus();
 	}
 	
