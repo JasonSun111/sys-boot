@@ -3,6 +3,9 @@ package com.sunys.core.run;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.sunys.facade.run.RootGroupRun;
+import com.sunys.facade.run.Run;
+
 public class RunContext {
 
 	private static final ThreadLocal<Run> runThreadLocal = new ThreadLocal<>();

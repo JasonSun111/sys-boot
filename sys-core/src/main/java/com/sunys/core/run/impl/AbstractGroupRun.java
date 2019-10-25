@@ -7,10 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.sunys.core.run.GroupRun;
-import com.sunys.core.run.Run;
-import com.sunys.core.run.RunStatus;
-import com.sunys.core.run.RunType;
+import com.sunys.facade.run.GroupRun;
+import com.sunys.facade.run.Run;
+import com.sunys.facade.run.RunStatus;
+import com.sunys.facade.run.RunType;
 
 public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implements GroupRun<T> {
 
