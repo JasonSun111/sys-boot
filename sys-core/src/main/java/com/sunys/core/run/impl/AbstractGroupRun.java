@@ -6,6 +6,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.Run;
@@ -13,6 +17,12 @@ import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.RunType;
 
 public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implements GroupRun<T> {
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractGroupRun.class);
+
+	private Condition eventCondition = lock.newCondition();
+
+	private int eventIndex;
 
 	@Override
 	public void init() {
@@ -73,35 +83,70 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 						setStatus(RunStatus.fail);
 					}
 				} catch (ExecutionException e) {
+					logger.error(e.getMessage(), e);
 					setStatus(RunStatus.fail);
-					e.printStackTrace();
 				}
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		shutdown(pool);
 	}
 
-	private void shutdown(ExecutorService pool) {
-		pool.shutdown();
-		try {
-			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
-				pool.shutdownNow();
+	protected void eventRun() {
+		List<T> runs = getRuns();
+		ExecutorService pool = Executors.newFixedThreadPool(runs.size());
+		while (RunStatus.running.equals(status)) {
+			lock.lock();
+			try {
+				logger.info("eventRun wait...");
+				eventCondition.await();
+				logger.info("eventRun notify, status {}", status);
+				if (RunStatus.running.equals(status)) {
+					Run run = runs.get(eventIndex);
+					if (!RunStatus.running.equals(run.getStatus())) {
+						logger.info("eventRun run index {}", eventIndex);
+						pool.execute(run::run);
+					}
+				}
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
+				break;
+			} finally {
+				lock.unlock();
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			pool.shutdownNow();
-			Thread.currentThread().interrupt();
+		}
+		shutdown(pool);
+	}
+
+	public void eventRun(int eventIndex) {
+		lock.lock();
+		try {
+			if (RunStatus.running.equals(status)) {
+				this.eventIndex = eventIndex;
+				logger.info("eventRun signal..., index {}", eventIndex);
+				eventCondition.signal();
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
-	protected void eventRun() {
-		
-	}
-
-	public void eventRun(int index) {
-		
+	private void shutdown(ExecutorService pool) {
+		logger.info("shutdown start...");
+		pool.shutdown();
+		try {
+			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+				logger.info("shutdownNow");
+				pool.shutdownNow();
+			}
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+			logger.info("shutdownNow");
+			pool.shutdownNow();
+			Thread.currentThread().interrupt();
+		}
+		logger.info("shutdown end");
 	}
 
 	@Override
@@ -114,6 +159,13 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		clean();
 		getRuns().forEach(Run::reset);
 		setStatus(RunStatus.idle);
+		lock.lock();
+		try {
+			logger.info("reset signal...");
+			eventCondition.signal();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
