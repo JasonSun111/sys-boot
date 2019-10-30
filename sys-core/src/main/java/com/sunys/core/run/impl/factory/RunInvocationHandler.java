@@ -33,7 +33,6 @@ public class RunInvocationHandler implements InvocationHandler {
 				Class<? extends RunMethodInterceptor>[] value = anno.value();
 				for (Class<? extends RunMethodInterceptor> clazz : value) {
 					RunMethodInterceptor interceptor = clazz.newInstance();
-					interceptor.setRun(run);
 					interceptors.add(interceptor);
 				}
 				String key = method.toString();

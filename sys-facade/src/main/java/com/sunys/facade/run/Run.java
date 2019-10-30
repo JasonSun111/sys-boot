@@ -4,6 +4,14 @@ import java.util.concurrent.Callable;
 
 public interface Run extends Callable<RunStatus> {
 
+	void startCheckTimeout();
+	
+	void cancelCheckTimeout();
+	
+	void await() throws InterruptedException;
+	
+	boolean await(int sec) throws InterruptedException;
+	
 	Run getProxy();
 	
 	void setProxy(Run proxy);
@@ -22,9 +30,9 @@ public interface Run extends Callable<RunStatus> {
 	
 	@Override
 	default RunStatus call() throws Exception {
-		Run run = getProxy();
-		if (run != null) {
-			run.run();
+		Run proxy = getProxy();
+		if (proxy != null) {
+			proxy.run();
 		} else {
 			run();
 		}

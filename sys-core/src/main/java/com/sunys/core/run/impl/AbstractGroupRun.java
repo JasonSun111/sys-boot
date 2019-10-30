@@ -96,9 +96,9 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	protected void eventRun() {
 		List<T> runs = getRuns();
 		ExecutorService pool = Executors.newFixedThreadPool(runs.size());
-		while (RunStatus.running.equals(status)) {
-			lock.lock();
-			try {
+		lock.lock();
+		try {
+			while (RunStatus.running.equals(status)) {
 				logger.info("eventRun wait...");
 				eventCondition.await();
 				logger.info("eventRun notify, status {}", status);
@@ -109,12 +109,11 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 						pool.execute(run::run);
 					}
 				}
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
-				break;
-			} finally {
-				lock.unlock();
 			}
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			lock.unlock();
 		}
 		shutdown(pool);
 	}
@@ -161,8 +160,10 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		setStatus(RunStatus.idle);
 		lock.lock();
 		try {
+			cancelCheckTimeout();
 			logger.info("reset signal...");
 			eventCondition.signal();
+			condition.signal();
 		} finally {
 			lock.unlock();
 		}

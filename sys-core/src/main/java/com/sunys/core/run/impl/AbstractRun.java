@@ -1,9 +1,14 @@
 package com.sunys.core.run.impl;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.sunys.core.run.RunContext;
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
@@ -19,6 +24,8 @@ public abstract class AbstractRun implements Run {
 	
 	protected final Lock lock = new ReentrantLock();
 	
+	protected Condition condition = lock.newCondition();
+	
 	protected volatile RunStatus status;
 	
 	protected GroupRun<? extends Run> parent;
@@ -26,11 +33,65 @@ public abstract class AbstractRun implements Run {
 	protected RootGroupRun<? extends Run> root;
 	
 	protected Long runDuration;
+	
+	protected long timeout;
+	
+	protected boolean isTimeout;
+	
+	private ScheduledFuture<?> timeoutScheduledFuture;
 
 	public AbstractRun() {
 		longAdder.increment();
 		this.id = longAdder.sum();
 	}
+
+	@Override
+	public void startCheckTimeout() {
+		ScheduledExecutorService scheduledExecutorService = RunContext.getScheduledExecutorService();
+		timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, getTimeout(), TimeUnit.SECONDS);
+	}
+
+	@Override
+	public void cancelCheckTimeout() {
+		if (timeoutScheduledFuture != null && !timeoutScheduledFuture.isCancelled()) {
+			timeoutScheduledFuture.cancel(false);
+			isTimeout = false;
+		}
+	}
+
+	@Override
+	public void await() throws InterruptedException {
+		lock.lock();
+		try {
+			condition.await();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public boolean await(int sec) throws InterruptedException {
+		lock.lock();
+		try {
+			boolean flag = condition.await(sec, TimeUnit.SECONDS);
+			return flag;
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	private void timeout() {
+		lock.lock();
+		try {
+			timeoutHandle();
+			isTimeout = true;
+			condition.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public abstract void timeoutHandle();
 
 	@Override
 	public Run getProxy() {
@@ -95,6 +156,14 @@ public abstract class AbstractRun implements Run {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	public long getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
 	}
 
 }
