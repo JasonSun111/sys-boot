@@ -49,8 +49,16 @@ public abstract class AbstractRun implements Run {
 
 	@Override
 	public void startCheckTimeout() {
+		startCheckTimeout(null);
+	}
+	
+	@Override
+	public void startCheckTimeout(Long timeout) {
+		if (timeout == null) {
+			timeout = getTimeout();
+		}
 		ScheduledExecutorService scheduledExecutorService = RunContext.getScheduledExecutorService();
-		timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, getTimeout(), TimeUnit.SECONDS);
+		timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, timeout, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -59,6 +67,11 @@ public abstract class AbstractRun implements Run {
 			timeoutScheduledFuture.cancel(false);
 			isTimeout = false;
 		}
+	}
+
+	@Override
+	public boolean isTimeout() {
+		return isTimeout;
 	}
 
 	@Override
@@ -170,6 +183,7 @@ public abstract class AbstractRun implements Run {
 		}
 	}
 
+	@Override
 	public long getTimeout() {
 		return timeout;
 	}

@@ -1,6 +1,7 @@
 package com.sunys.core.run.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sunys.facade.run.GroupRun;
+import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.RunType;
@@ -106,7 +108,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 					Run run = runs.get(eventIndex);
 					if (!RunStatus.running.equals(run.getStatus())) {
 						logger.info("eventRun run index {}", eventIndex);
-						pool.execute(run::run);
+						pool.submit(run);
 					}
 				}
 			}

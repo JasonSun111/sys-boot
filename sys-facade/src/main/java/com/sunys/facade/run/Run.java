@@ -8,7 +8,13 @@ public interface Run extends Callable<RunStatus> {
 	
 	String getName();
 	
+	long getTimeout();
+	
+	boolean isTimeout();
+	
 	void startCheckTimeout();
+	
+	void startCheckTimeout(Long timeout);
 	
 	void cancelCheckTimeout();
 	
