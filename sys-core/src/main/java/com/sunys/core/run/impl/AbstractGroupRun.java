@@ -118,7 +118,46 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		shutdown(pool);
 	}
 
+	@Override
+	public void updateEventRunStatus() {
+		updateEventRunStatus(null);
+	}
+
+	@Override
+	public void updateEventRunStatus(RunStatus status) {
+		if (!getRunType().equals(RunType.event)) {
+			return;
+		}
+		lock.lock();
+		try {
+			if (status == null) {
+				List<T> runs = getRuns();
+				boolean fail = runs.stream().anyMatch(run -> RunStatus.fail.equals(run.getStatus()));
+				if (fail) {
+					setStatus(RunStatus.fail);
+					eventCondition.signal();
+					return;
+				}
+				boolean success = runs.stream().allMatch(run -> RunStatus.success.equals(run.getStatus()));
+				if (success) {
+					setStatus(RunStatus.success);
+					eventCondition.signal();
+					return;
+				}
+			} else {
+				setStatus(status);
+				eventCondition.signal();
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
 	public void eventRun(int eventIndex) {
+		if (!getRunType().equals(RunType.event)) {
+			return;
+		}
 		lock.lock();
 		try {
 			if (RunStatus.running.equals(status)) {

@@ -11,9 +11,12 @@ public class ContextRunMethodInterceptor implements RunMethodInterceptor {
 	public Object intercept(RunChain runChain) throws Exception {
 		Run run = runChain.getRun();
 		RunContext.pushRun(run);
-		Object obj = runChain.invoke();
-		RunContext.popRun();
-		return obj;
+		try {
+			Object obj = runChain.invoke();
+			return obj;
+		} finally {
+			RunContext.popRun();
+		}
 	}
 
 }

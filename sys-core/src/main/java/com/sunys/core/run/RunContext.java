@@ -5,11 +5,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 
 public class RunContext {
 
+	private static final Logger logger = LoggerFactory.getLogger(RunContext.class);
+	
 	private static final ThreadLocal<LinkedList<Run>> runThreadLocal = new ThreadLocal<>();
 	
 	private static final Map<Long, RootGroupRun<Run>> rootGroupRunMap = new ConcurrentHashMap<>();
@@ -17,11 +22,13 @@ public class RunContext {
 	public static void pushRun(Run run) {
 		LinkedList<Run> linkedList = getStack();
 		linkedList.push(run);
+		logger.info("RunContext push Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
 	}
 	
 	public static void popRun() {
 		LinkedList<Run> linkedList = getStack();
-		linkedList.pop();
+		Run run = linkedList.pop();
+		logger.info("RunContext pop Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
 		if (linkedList.size() == 0) {
 			runThreadLocal.remove();
 		}

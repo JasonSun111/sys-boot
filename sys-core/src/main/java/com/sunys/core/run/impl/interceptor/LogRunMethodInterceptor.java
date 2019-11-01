@@ -9,18 +9,15 @@ import com.sunys.facade.run.RunMethodInterceptor;
 
 public class LogRunMethodInterceptor implements RunMethodInterceptor {
 
-	private Logger logger;
+	private static final Logger logger = LoggerFactory.getLogger(LogRunMethodInterceptor.class);
 	
 	@Override
 	public Object intercept(RunChain runChain) throws Exception {
 		Run run = runChain.getRun();
-		if (logger == null) {
-			logger = LoggerFactory.getLogger(run.getClass());
-		}
 		String methodName = runChain.getMethod().getName();
-		logger.info("{} {} run start", run.getClass().getSimpleName(), methodName);
+		logger.info("Class:{}, method:{}, name:{}, id:{}, run start", run.getClass().getSimpleName(), methodName, run.getName(), run.getId());
 		Object obj = runChain.invoke();
-		logger.info("{} {} run end", run.getClass().getSimpleName(), methodName);
+		logger.info("Class:{}, method:{}, name:{}, id:{}, run end", run.getClass().getSimpleName(), methodName, run.getName(), run.getId());
 		return obj;
 	}
 
