@@ -360,6 +360,31 @@ semanage port -l | grep ssh
 第三步：重启ssh服务
 systemctl restart sshd.service
 
+
+
+防火墙
+查看防火墙状态
+firewall-cmd --state
+查看当前规则
+firewall-cmd --list-all
+查询tcp8080端口是否开放
+firewall-cmd --query-port=8080/tcp
+开放tcp80端口
+firewall-cmd --permanent --add-port=80/tcp
+移除8080端口
+firewall-cmd --permanent --remove-port=8080/tcp
+
+重启防火墙规则（修改配置后重启生效）
+firewall-cmd --reload
+
+firwall-cmd：是Linux提供的操作firewall的一个工具
+--permanent：表示设置为持久
+--add-port：标识添加的端口
+
+
+
+
+
 gzip --fast install.log
 gzip --bast install.log
 gzip -d install.log.gz
