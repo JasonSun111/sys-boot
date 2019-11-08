@@ -8,7 +8,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 
 public class RunContext {
@@ -17,7 +16,7 @@ public class RunContext {
 	
 	private static final ThreadLocal<LinkedList<Run>> runThreadLocal = new ThreadLocal<>();
 	
-	private static final Map<Long, RootGroupRun<Run>> rootGroupRunMap = new ConcurrentHashMap<>();
+	private static final Map<Long, Run> runMap = new ConcurrentHashMap<>();
 	
 	public static void pushRun(Run run) {
 		LinkedList<Run> linkedList = getStack();
@@ -55,15 +54,14 @@ public class RunContext {
 		return linkedList;
 	}
 	
-	public static <T extends Run> T getRun(Long rootId, Long id) {
-		RootGroupRun<Run> rootGroupRun = rootGroupRunMap.get(rootId);
-		Run run = rootGroupRun.runMap().get(id);
+	public static <T extends Run> T getRun(Long id) {
+		Run run = runMap.get(id);
 		return (T) run;
 	}
 	
-	public static RootGroupRun<Run> getRoot(Long rootId) {
-		RootGroupRun<Run> rootGroupRun = rootGroupRunMap.get(rootId);
-		return rootGroupRun;
+	public static void putRun(Run run) {
+		logger.info("RunContext put Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
+		runMap.put(run.getId(), run);
 	}
 	
 	public static ScheduledExecutorService getScheduledExecutorService() {

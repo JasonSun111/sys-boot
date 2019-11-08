@@ -1,7 +1,6 @@
 package com.sunys.core.run.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sunys.facade.run.GroupRun;
-import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.RunType;
@@ -27,7 +25,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	private int eventIndex;
 
 	@Override
-	public void init() {
+	public void init() throws Exception {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
 			run.init();
@@ -41,7 +39,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	@Override
-	public void run() {
+	public void run() throws Exception {
 		setStatus(RunStatus.running);
 		switch (getRunType()) {
 		case serial:
@@ -59,7 +57,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		}
 	}
 
-	protected void serialRun() {
+	protected void serialRun() throws Exception {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
 			if (RunStatus.running.equals(status)) {
@@ -127,7 +125,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void updateEventRunStatus(RunStatus status) {
-		if (!getRunType().equals(RunType.event)) {
+		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
 		lock.lock();
@@ -157,7 +155,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void eventRun(int eventIndex) {
-		if (!getRunType().equals(RunType.event)) {
+		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
 		lock.lock();

@@ -34,9 +34,9 @@ public interface Run extends Callable<RunStatus> {
 	
 	RootGroupRun<? extends Run> getRoot();
 	
-	void init();
+	void init() throws Exception;
 	
-	void run();
+	void run() throws Exception;
 	
 	@Override
 	default RunStatus call() throws Exception {
