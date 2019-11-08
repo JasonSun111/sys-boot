@@ -16,7 +16,7 @@ public class RunInvocationHandler implements InvocationHandler {
 
 	private Run run;
 	
-	private Map<String, List<RunMethodInterceptor>> interceptorsMap = new HashMap<>();
+	private Map<Method, List<RunMethodInterceptor>> interceptorsMap = new HashMap<>();
 	
 	public RunInvocationHandler(Run run) throws InstantiationException, IllegalAccessException {
 		this.run = run;
@@ -35,16 +35,14 @@ public class RunInvocationHandler implements InvocationHandler {
 					RunMethodInterceptor interceptor = clazz.newInstance();
 					interceptors.add(interceptor);
 				}
-				String key = method.toString();
-				interceptorsMap.put(key, interceptors);
+				interceptorsMap.put(method, interceptors);
 			}
 		}
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		String key = method.toString();
-		List<RunMethodInterceptor> interceptors = interceptorsMap.get(key);
+		List<RunMethodInterceptor> interceptors = interceptorsMap.get(method);
 		RunChain runChain = new RunChain(interceptors, run, method, args);
 		Object obj = runChain.invoke();
 		return obj;
