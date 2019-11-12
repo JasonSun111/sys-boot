@@ -3,7 +3,6 @@ package com.sunys.core.run;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +26,10 @@ public class RunContext {
 	public static void popRun() {
 		LinkedList<Run> linkedList = getStack();
 		Run run = linkedList.pop();
-		logger.info("RunContext pop Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
 		if (linkedList.size() == 0) {
 			runThreadLocal.remove();
 		}
+		logger.info("RunContext pop Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
 	}
 	
 	public static <T extends Run> T currentRun() {
@@ -60,11 +59,6 @@ public class RunContext {
 	}
 	
 	public static void putRun(Run run) {
-		logger.info("RunContext put Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
 		runMap.put(run.getId(), run);
-	}
-	
-	public static ScheduledExecutorService getScheduledExecutorService() {
-		return null;
 	}
 }

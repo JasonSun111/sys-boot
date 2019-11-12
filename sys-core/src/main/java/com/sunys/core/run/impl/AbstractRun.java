@@ -8,7 +8,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.sunys.core.run.RunContext;
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
@@ -47,6 +46,8 @@ public abstract class AbstractRun implements Run {
 		this.id = longAdder.sum();
 	}
 
+	public abstract ScheduledExecutorService getScheduled();
+	
 	@Override
 	public void startCheckTimeout() {
 		startCheckTimeout(null);
@@ -57,15 +58,16 @@ public abstract class AbstractRun implements Run {
 		if (timeout == null) {
 			timeout = getTimeout();
 		}
-		ScheduledExecutorService scheduledExecutorService = RunContext.getScheduledExecutorService();
-		timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, timeout, TimeUnit.SECONDS);
+		if (timeout != null && timeout > 0) {
+			ScheduledExecutorService scheduledExecutorService = getScheduled();
+			timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, timeout, TimeUnit.SECONDS);
+		}
 	}
 
 	@Override
 	public void cancelCheckTimeout() {
 		if (timeoutScheduledFuture != null && !timeoutScheduledFuture.isCancelled()) {
 			timeoutScheduledFuture.cancel(false);
-			isTimeout = false;
 		}
 	}
 
@@ -98,8 +100,8 @@ public abstract class AbstractRun implements Run {
 	private void timeout() {
 		lock.lock();
 		try {
-			timeoutHandle();
 			isTimeout = true;
+			timeoutHandle();
 			condition.signal();
 		} finally {
 			lock.unlock();
@@ -110,10 +112,7 @@ public abstract class AbstractRun implements Run {
 
 	@Override
 	public Run getProxy() {
-		if (proxy != null) {
-			return proxy;
-		}
-		return this;
+		return proxy;
 	}
 
 	@Override

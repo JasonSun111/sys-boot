@@ -3,9 +3,7 @@ package com.sunys.core.run.impl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 
 import org.slf4j.Logger;
@@ -24,6 +22,8 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	private int eventIndex;
 
+	private RunType runType = RunType.serial;
+
 	@Override
 	public void init() throws Exception {
 		List<T> runs = getRuns();
@@ -31,12 +31,15 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			run.init();
 			if (!RunStatus.idle.equals(run.getStatus())) {
 				status = run.getStatus();
+				break;
 			}
 		}
 		if (status == null) {
 			status = RunStatus.idle;
 		}
 	}
+
+	public abstract ExecutorService getExecutorService();
 
 	@Override
 	public void run() throws Exception {
@@ -73,7 +76,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	protected void parallelRun() {
 		List<T> runs = getRuns();
-		ExecutorService pool = Executors.newFixedThreadPool(runs.size());
+		ExecutorService pool = getExecutorService();
 		try {
 			List<Future<RunStatus>> futures = pool.invokeAll(runs);
 			for (Future<RunStatus> future : futures) {
@@ -90,12 +93,11 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		shutdown(pool);
 	}
 
 	protected void eventRun() {
 		List<T> runs = getRuns();
-		ExecutorService pool = Executors.newFixedThreadPool(runs.size());
+		ExecutorService pool = getExecutorService();
 		lock.lock();
 		try {
 			while (RunStatus.running.equals(status)) {
@@ -115,16 +117,15 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		} finally {
 			lock.unlock();
 		}
-		shutdown(pool);
 	}
 
 	@Override
-	public void updateEventRunStatus() {
-		updateEventRunStatus(null);
+	public void setEventRunStatus() {
+		setEventRunStatus(null);
 	}
 
 	@Override
-	public void updateEventRunStatus(RunStatus status) {
+	public void setEventRunStatus(RunStatus status) {
 		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
@@ -170,23 +171,6 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		}
 	}
 
-	private void shutdown(ExecutorService pool) {
-		logger.info("shutdown start...");
-		pool.shutdown();
-		try {
-			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
-				logger.info("shutdownNow");
-				pool.shutdownNow();
-			}
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-			logger.info("shutdownNow");
-			pool.shutdownNow();
-			Thread.currentThread().interrupt();
-		}
-		logger.info("shutdown end");
-	}
-
 	@Override
 	public void clean() {
 		getRuns().forEach(Run::clean);
@@ -196,10 +180,11 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	public void reset() {
 		clean();
 		getRuns().forEach(Run::reset);
-		setStatus(RunStatus.idle);
 		lock.lock();
 		try {
+			setStatus(RunStatus.idle);
 			cancelCheckTimeout();
+			isTimeout = false;
 			logger.info("reset signal...");
 			eventCondition.signal();
 			condition.signal();
@@ -224,7 +209,11 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public RunType getRunType() {
-		return RunType.serial;
+		return runType;
+	}
+
+	public void setRunType(RunType runType) {
+		this.runType = runType;
 	}
 
 }

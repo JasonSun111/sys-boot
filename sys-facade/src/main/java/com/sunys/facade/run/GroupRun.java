@@ -10,7 +10,7 @@ public interface GroupRun<T extends Run> extends Run {
 	
 	void eventRun(int eventIndex);
 	
-	void updateEventRunStatus();
+	void setEventRunStatus();
 	
-	void updateEventRunStatus(RunStatus status);
+	void setEventRunStatus(RunStatus status);
 }
