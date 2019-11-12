@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
-import com.sunys.core.run.RunContext;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunFactory;
 
@@ -17,7 +16,6 @@ public abstract class AbstractRunFactory<T extends Run> implements RunFactory<T>
 		T run = createRun(obj);
 		T runProxy = getProxy(run);
 		run.setProxy(runProxy);
-		RunContext.putRun(runProxy);
 		return runProxy;
 	}
 

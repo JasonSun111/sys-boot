@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Condition;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractGroupRun.class);
 
-	private Condition eventCondition = lock.newCondition();
+	private List<Future<RunStatus>> futures;
 
 	private int eventIndex;
 
@@ -78,7 +77,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		List<T> runs = getRuns();
 		ExecutorService pool = getExecutorService();
 		try {
-			List<Future<RunStatus>> futures = pool.invokeAll(runs);
+			futures = pool.invokeAll(runs);
 			for (Future<RunStatus> future : futures) {
 				try {
 					RunStatus status = future.get();
@@ -102,12 +101,12 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		try {
 			while (RunStatus.running.equals(status)) {
 				logger.info("eventRun wait...");
-				eventCondition.await();
-				logger.info("eventRun notify, status {}", status);
+				condition.await();
+				logger.info("eventRun notify, status:{}", status);
 				if (RunStatus.running.equals(status)) {
 					Run run = runs.get(eventIndex);
 					if (!RunStatus.running.equals(run.getStatus())) {
-						logger.info("eventRun run index {}", eventIndex);
+						logger.info("eventRun run, index:{}", eventIndex);
 						pool.submit(run);
 					}
 				}
@@ -126,7 +125,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void setEventRunStatus(RunStatus status) {
-		if (!RunType.event.equals(getRunType())) {
+		if (!RunType.event.equals(getRunType()) || !RunStatus.running.equals(this.status)) {
 			return;
 		}
 		lock.lock();
@@ -136,18 +135,18 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 				boolean fail = runs.stream().anyMatch(run -> RunStatus.fail.equals(run.getStatus()));
 				if (fail) {
 					setStatus(RunStatus.fail);
-					eventCondition.signal();
+					condition.signal();
 					return;
 				}
 				boolean success = runs.stream().allMatch(run -> RunStatus.success.equals(run.getStatus()));
 				if (success) {
 					setStatus(RunStatus.success);
-					eventCondition.signal();
+					condition.signal();
 					return;
 				}
 			} else {
 				setStatus(status);
-				eventCondition.signal();
+				condition.signal();
 			}
 		} finally {
 			lock.unlock();
@@ -163,8 +162,8 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		try {
 			if (RunStatus.running.equals(status)) {
 				this.eventIndex = eventIndex;
-				logger.info("eventRun signal..., index {}", eventIndex);
-				eventCondition.signal();
+				logger.info("eventRun signal..., index:{}", eventIndex);
+				condition.signal();
 			}
 		} finally {
 			lock.unlock();
@@ -186,7 +185,6 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			cancelCheckTimeout();
 			isTimeout = false;
 			logger.info("reset signal...");
-			eventCondition.signal();
 			condition.signal();
 		} finally {
 			lock.unlock();
