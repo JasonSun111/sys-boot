@@ -42,8 +42,10 @@ public abstract class AbstractRun implements Run {
 	private ScheduledFuture<?> timeoutScheduledFuture;
 
 	public AbstractRun() {
-		longAdder.increment();
-		this.id = longAdder.sum();
+		synchronized (AbstractRun.class) {
+			longAdder.increment();
+			this.id = longAdder.sum();
+		}
 	}
 
 	public abstract ScheduledExecutorService getScheduled();

@@ -19,8 +19,6 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	private List<Future<RunStatus>> futures;
 
-	private int eventIndex;
-
 	private RunType runType = RunType.serial;
 
 	@Override
@@ -95,21 +93,12 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	protected void eventRun() {
-		List<T> runs = getRuns();
-		ExecutorService pool = getExecutorService();
 		lock.lock();
 		try {
 			while (RunStatus.running.equals(status)) {
 				logger.info("eventRun wait...");
 				condition.await();
 				logger.info("eventRun notify, status:{}", status);
-				if (RunStatus.running.equals(status)) {
-					Run run = runs.get(eventIndex);
-					if (!RunStatus.running.equals(run.getStatus())) {
-						logger.info("eventRun run, index:{}", eventIndex);
-						pool.submit(run);
-					}
-				}
 			}
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
@@ -158,12 +147,16 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
+		List<T> runs = getRuns();
+		ExecutorService pool = getExecutorService();
 		lock.lock();
 		try {
 			if (RunStatus.running.equals(status)) {
-				this.eventIndex = eventIndex;
-				logger.info("eventRun signal..., index:{}", eventIndex);
-				condition.signal();
+				Run run = runs.get(eventIndex);
+				if (!RunStatus.running.equals(run.getStatus())) {
+					logger.info("eventRun run, index:{}", eventIndex);
+					pool.submit(run);
+				}
 			}
 		} finally {
 			lock.unlock();
