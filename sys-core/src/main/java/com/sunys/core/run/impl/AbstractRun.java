@@ -1,17 +1,14 @@
 package com.sunys.core.run.impl;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
+import com.sunys.facade.run.TimeoutCheckHandler;
 
 public abstract class AbstractRun implements Run {
 
@@ -23,10 +20,6 @@ public abstract class AbstractRun implements Run {
 	
 	protected String name;
 	
-	protected final Lock lock = new ReentrantLock();
-	
-	protected Condition condition = lock.newCondition();
-	
 	protected volatile RunStatus status;
 	
 	protected GroupRun<? extends Run> parent;
@@ -34,12 +27,8 @@ public abstract class AbstractRun implements Run {
 	protected RootGroupRun<? extends Run> root;
 	
 	protected Long runDuration;
-	
-	protected long timeout;
-	
-	protected boolean isTimeout;
-	
-	private ScheduledFuture<?> timeoutScheduledFuture;
+
+	protected TimeoutCheckHandler timeoutCheckHandler;
 
 	public AbstractRun() {
 		synchronized (AbstractRun.class) {
@@ -47,70 +36,6 @@ public abstract class AbstractRun implements Run {
 			this.id = longAdder.sum();
 		}
 	}
-
-	public abstract ScheduledExecutorService getScheduled();
-	
-	@Override
-	public void startCheckTimeout() {
-		startCheckTimeout(null);
-	}
-	
-	@Override
-	public void startCheckTimeout(Long timeout) {
-		if (timeout == null) {
-			timeout = getTimeout();
-		}
-		if (timeout != null && timeout > 0) {
-			ScheduledExecutorService scheduledExecutorService = getScheduled();
-			timeoutScheduledFuture = scheduledExecutorService.schedule(this::timeout, timeout, TimeUnit.SECONDS);
-		}
-	}
-
-	@Override
-	public void cancelCheckTimeout() {
-		if (timeoutScheduledFuture != null && !timeoutScheduledFuture.isCancelled()) {
-			timeoutScheduledFuture.cancel(false);
-		}
-	}
-
-	@Override
-	public boolean isTimeout() {
-		return isTimeout;
-	}
-
-	@Override
-	public void await() throws InterruptedException {
-		lock.lock();
-		try {
-			condition.await();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
-	public boolean await(int sec) throws InterruptedException {
-		lock.lock();
-		try {
-			boolean flag = condition.await(sec, TimeUnit.SECONDS);
-			return flag;
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	private void timeout() {
-		lock.lock();
-		try {
-			isTimeout = true;
-			timeoutHandle();
-			condition.signal();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	public abstract void timeoutHandle();
 
 	@Override
 	public Run getProxy() {
@@ -176,21 +101,13 @@ public abstract class AbstractRun implements Run {
 	}
 
 	public void setStatus(RunStatus status) {
+		Lock lock = timeoutCheckHandler.getLock();
 		lock.lock();
 		try {
 			this.status = status;
 		} finally {
 			lock.unlock();
 		}
-	}
-
-	@Override
-	public long getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(long timeout) {
-		this.timeout = timeout;
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +95,8 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	protected void eventRun() {
+		Lock lock = timeoutCheckHandler.getLock();
+		Condition condition = timeoutCheckHandler.getDefaultCondition();
 		lock.lock();
 		try {
 			while (RunStatus.running.equals(status)) {
@@ -117,6 +121,8 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		if (!RunType.event.equals(getRunType()) || !RunStatus.running.equals(this.status)) {
 			return;
 		}
+		Lock lock = timeoutCheckHandler.getLock();
+		Condition condition = timeoutCheckHandler.getDefaultCondition();
 		lock.lock();
 		try {
 			if (status == null) {
@@ -147,6 +153,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
+		Lock lock = timeoutCheckHandler.getLock();
 		List<T> runs = getRuns();
 		ExecutorService pool = getExecutorService();
 		lock.lock();
@@ -155,7 +162,13 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 				Run run = runs.get(eventIndex);
 				if (!RunStatus.running.equals(run.getStatus())) {
 					logger.info("eventRun run, index:{}", eventIndex);
-					pool.submit(run);
+					pool.execute(() -> {
+						try {
+							run.run();
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}
+					});
 				}
 			}
 		} finally {
@@ -172,11 +185,12 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	public void reset() {
 		clean();
 		getRuns().forEach(Run::reset);
+		Lock lock = timeoutCheckHandler.getLock();
+		Condition condition = timeoutCheckHandler.getDefaultCondition();
 		lock.lock();
 		try {
 			setStatus(RunStatus.idle);
-			cancelCheckTimeout();
-			isTimeout = false;
+			timeoutCheckHandler.reset();
 			logger.info("reset signal...");
 			condition.signal();
 		} finally {
@@ -185,8 +199,8 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	@Override
-	public void destory() {
-		getRuns().forEach(Run::destory);
+	public void destroy() {
+		getRuns().forEach(Run::destroy);
 		setStatus(RunStatus.destory);
 	}
 

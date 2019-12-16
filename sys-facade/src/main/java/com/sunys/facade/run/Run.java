@@ -8,20 +8,6 @@ public interface Run extends Callable<RunStatus> {
 	
 	String getName();
 	
-	long getTimeout();
-	
-	boolean isTimeout();
-	
-	void startCheckTimeout();
-	
-	void startCheckTimeout(Long timeout);
-	
-	void cancelCheckTimeout();
-	
-	void await() throws InterruptedException;
-	
-	boolean await(int sec) throws InterruptedException;
-	
 	Run getProxy();
 	
 	void setProxy(Run proxy);
@@ -55,5 +41,5 @@ public interface Run extends Callable<RunStatus> {
 	
 	long calculateRunDuration();
 	
-	void destory();
+	void destroy();
 }
