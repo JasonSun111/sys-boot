@@ -1,6 +1,5 @@
 package com.sunys.facade.run;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -19,13 +18,11 @@ public interface TimeoutCheckHandler {
 	
 	Long getDelay(TimeUnit unit);
 	
-	ScheduledExecutorService getScheduled();
-	
 	void startCheckTimeout();
 	
 	void startCheckTimeout(Long timeout);
 	
-	void cancelCheckTimeout();
+	void cancelCheckTimeout(boolean flag);
 	
 	void await() throws InterruptedException;
 	

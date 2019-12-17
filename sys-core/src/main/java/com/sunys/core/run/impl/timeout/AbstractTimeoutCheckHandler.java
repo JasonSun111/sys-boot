@@ -27,7 +27,15 @@ public abstract class AbstractTimeoutCheckHandler implements TimeoutCheckHandler
 		this.lock = lock;
 		this.condition = lock.newCondition();
 		this.timeout = timeout;
+		this.timeoutHandle = timeoutHandle;
 	}
+	
+	public AbstractTimeoutCheckHandler(long timeout, Runnable timeoutHandle) {
+		this.timeout = timeout;
+		this.timeoutHandle = timeoutHandle;
+	}
+
+	protected abstract ScheduledExecutorService getScheduled();
 
 	@Override
 	public Lock getLock() {
@@ -79,9 +87,9 @@ public abstract class AbstractTimeoutCheckHandler implements TimeoutCheckHandler
 	}
 
 	@Override
-	public void cancelCheckTimeout() {
+	public void cancelCheckTimeout(boolean flag) {
 		if (timeoutScheduledFuture != null && !timeoutScheduledFuture.isCancelled()) {
-			timeoutScheduledFuture.cancel(false);
+			timeoutScheduledFuture.cancel(flag);
 		}
 	}
 
@@ -145,7 +153,7 @@ public abstract class AbstractTimeoutCheckHandler implements TimeoutCheckHandler
 		lock.lock();
 		try {
 			isTimeout = false;
-			cancelCheckTimeout();
+			cancelCheckTimeout(false);
 		} finally {
 			lock.unlock();
 		}

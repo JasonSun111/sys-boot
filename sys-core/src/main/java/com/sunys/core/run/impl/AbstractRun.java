@@ -1,7 +1,6 @@
 package com.sunys.core.run.impl;
 
 import java.util.concurrent.atomic.LongAdder;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import com.sunys.facade.run.GroupRun;

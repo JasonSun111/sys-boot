@@ -38,7 +38,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		}
 	}
 
-	public abstract ExecutorService getExecutorService();
+	protected abstract ExecutorService getExecutorService();
 
 	@Override
 	public void run() throws Exception {
