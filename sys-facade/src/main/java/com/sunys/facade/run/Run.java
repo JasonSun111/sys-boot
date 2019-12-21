@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 
 public interface Run extends Callable<RunStatus> {
 
-	Long getId();
+	long getId();
 	
 	String getName();
 	

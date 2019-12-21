@@ -8,8 +8,9 @@ public interface RunFactory<T extends Run> {
 	
 	static <R extends Run> R getRun(Object obj) throws Exception {
 		Factory anno = obj.getClass().getAnnotation(Factory.class);
-		Class<? extends RunFactory<? extends Run>> clazz = anno.value();
-		RunFactory<? extends Run> runFactory = clazz.newInstance();
+		String className = anno.value();
+		Class<?> clazz = Class.forName(className);
+		RunFactory<? extends Run> runFactory = (RunFactory<? extends Run>) clazz.newInstance();
 		R instance = (R) runFactory.getInstance(obj);
 		return instance;
 	}

@@ -7,7 +7,7 @@ import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
-import com.sunys.facade.run.TimeoutCheckHandler;
+import com.sunys.facade.run.TimeoutCheck;
 
 public abstract class AbstractRun implements Run {
 
@@ -15,7 +15,7 @@ public abstract class AbstractRun implements Run {
 	
 	private Run proxy;
 	
-	protected Long id;
+	protected long id;
 	
 	protected String name;
 	
@@ -27,7 +27,7 @@ public abstract class AbstractRun implements Run {
 	
 	protected Long runDuration;
 
-	protected TimeoutCheckHandler timeoutCheckHandler;
+	protected TimeoutCheck timeoutCheck;
 
 	public AbstractRun() {
 		synchronized (AbstractRun.class) {
@@ -59,11 +59,11 @@ public abstract class AbstractRun implements Run {
 	}
 
 	@Override
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -100,7 +100,7 @@ public abstract class AbstractRun implements Run {
 	}
 
 	public void setStatus(RunStatus status) {
-		Lock lock = timeoutCheckHandler.getLock();
+		Lock lock = timeoutCheck.getLock();
 		lock.lock();
 		try {
 			this.status = status;

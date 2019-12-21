@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-public interface TimeoutCheckHandler {
+public interface TimeoutCheck {
 
 	Lock getLock();
 	
@@ -21,6 +21,8 @@ public interface TimeoutCheckHandler {
 	void startCheckTimeout();
 	
 	void startCheckTimeout(Long timeout);
+	
+	void startCheckTimeout(Long timeout, TimeUnit unit);
 	
 	void cancelCheckTimeout(boolean flag);
 	

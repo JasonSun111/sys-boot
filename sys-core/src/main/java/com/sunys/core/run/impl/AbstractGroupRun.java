@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import org.slf4j.Logger;
@@ -19,9 +18,9 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractGroupRun.class);
 
-	private List<Future<RunStatus>> futures;
+	protected List<Future<RunStatus>> futures;
 
-	private RunType runType = RunType.serial;
+	protected RunType runType = RunType.serial;
 
 	@Override
 	public void init() throws Exception {
@@ -95,13 +94,12 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	protected void eventRun() {
-		Lock lock = timeoutCheckHandler.getLock();
-		Condition condition = timeoutCheckHandler.getDefaultCondition();
+		Lock lock = timeoutCheck.getLock();
 		lock.lock();
 		try {
 			while (RunStatus.running.equals(status)) {
 				logger.info("eventRun wait...");
-				condition.await();
+				timeoutCheck.await();
 				logger.info("eventRun notify, status:{}", status);
 			}
 		} catch (InterruptedException e) {
@@ -121,30 +119,23 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		if (!RunType.event.equals(getRunType()) || !RunStatus.running.equals(this.status)) {
 			return;
 		}
-		Lock lock = timeoutCheckHandler.getLock();
-		Condition condition = timeoutCheckHandler.getDefaultCondition();
-		lock.lock();
-		try {
-			if (status == null) {
-				List<T> runs = getRuns();
-				boolean fail = runs.stream().anyMatch(run -> RunStatus.fail.equals(run.getStatus()));
-				if (fail) {
-					setStatus(RunStatus.fail);
-					condition.signal();
-					return;
-				}
-				boolean success = runs.stream().allMatch(run -> RunStatus.success.equals(run.getStatus()));
-				if (success) {
-					setStatus(RunStatus.success);
-					condition.signal();
-					return;
-				}
-			} else {
-				setStatus(status);
-				condition.signal();
+		if (status == null) {
+			List<T> runs = getRuns();
+			boolean fail = runs.stream().anyMatch(run -> RunStatus.fail.equals(run.getStatus()));
+			if (fail) {
+				setStatus(RunStatus.fail);
+				timeoutCheck.signalAll();
+				return;
 			}
-		} finally {
-			lock.unlock();
+			boolean success = runs.stream().allMatch(run -> RunStatus.success.equals(run.getStatus()));
+			if (success) {
+				setStatus(RunStatus.success);
+				timeoutCheck.signalAll();
+				return;
+			}
+		} else {
+			setStatus(status);
+			timeoutCheck.signalAll();
 		}
 	}
 
@@ -153,7 +144,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		if (!RunType.event.equals(getRunType())) {
 			return;
 		}
-		Lock lock = timeoutCheckHandler.getLock();
+		Lock lock = timeoutCheck.getLock();
 		List<T> runs = getRuns();
 		ExecutorService pool = getExecutorService();
 		lock.lock();
@@ -183,25 +174,27 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void reset() {
-		clean();
 		getRuns().forEach(Run::reset);
-		Lock lock = timeoutCheckHandler.getLock();
-		Condition condition = timeoutCheckHandler.getDefaultCondition();
-		lock.lock();
-		try {
-			setStatus(RunStatus.idle);
-			timeoutCheckHandler.reset();
-			logger.info("reset signal...");
-			condition.signal();
-		} finally {
-			lock.unlock();
-		}
+		setStatus(RunStatus.idle);
+		timeoutCheck.reset();
 	}
 
 	@Override
 	public void destroy() {
 		getRuns().forEach(Run::destroy);
 		setStatus(RunStatus.destory);
+	}
+
+	@Override
+	public double getProgress() {
+		double finish = getRuns().stream().filter(run -> RunStatus.success.equals(getStatus()) || RunStatus.fail.equals(getStatus())).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
+		double total = calculateRunDuration();
+		if (total == 0) {
+			logger.error("total duration is 0, total:{}, finish:{}", total, finish);
+			return 0;
+		}
+		double result = finish * 100 / total;
+		return result;
 	}
 
 	@Override
