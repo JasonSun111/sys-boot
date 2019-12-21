@@ -9,6 +9,11 @@ import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.TimeoutCheck;
 
+/**
+ * AbstractRun
+ * @author sunys
+ * @date Dec 21, 2019
+ */
 public abstract class AbstractRun implements Run {
 
 	private static final LongAdder longAdder = new LongAdder();

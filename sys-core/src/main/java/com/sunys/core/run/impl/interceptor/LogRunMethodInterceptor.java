@@ -7,6 +7,11 @@ import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunChain;
 import com.sunys.facade.run.RunMethodInterceptor;
 
+/**
+ * LogRunMethodInterceptor
+ * @author sunys
+ * @date Dec 21, 2019
+ */
 public class LogRunMethodInterceptor implements RunMethodInterceptor {
 
 	private static final Logger logger = LoggerFactory.getLogger(LogRunMethodInterceptor.class);

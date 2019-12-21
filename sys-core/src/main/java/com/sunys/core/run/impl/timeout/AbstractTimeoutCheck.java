@@ -12,6 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import com.sunys.facade.run.TimeoutCheck;
 
+/**
+ * AbstractTimeoutCheck
+ * @author sunys
+ * @date Dec 21, 2019
+ */
 public abstract class AbstractTimeoutCheck implements TimeoutCheck {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractTimeoutCheck.class);
@@ -40,6 +45,10 @@ public abstract class AbstractTimeoutCheck implements TimeoutCheck {
 		this.timeoutHandler = timeoutHandler;
 	}
 
+	/**
+	 * 获取定时任务线程池
+	 * @return
+	 */
 	protected abstract ScheduledExecutorService getScheduled();
 
 	@Override

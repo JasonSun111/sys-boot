@@ -14,6 +14,11 @@ import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.RunType;
 
+/**
+ * AbstractGroupRun
+ * @author sunys
+ * @date Dec 21, 2019
+ */
 public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implements GroupRun<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractGroupRun.class);
@@ -27,21 +32,25 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		List<T> runs = getRuns();
 		for (Run run : runs) {
 			run.init();
-			if (!RunStatus.idle.equals(run.getStatus())) {
+			if (!RunStatus.Idle.equals(run.getStatus())) {
 				status = run.getStatus();
 				break;
 			}
 		}
 		if (status == null) {
-			status = RunStatus.idle;
+			status = RunStatus.Idle;
 		}
 	}
 
+	/**
+	 * 获取线程池接口
+	 * @return
+	 */
 	protected abstract ExecutorService getExecutorService();
 
 	@Override
 	public void run() throws Exception {
-		setStatus(RunStatus.running);
+		setStatus(RunStatus.Running);
 		switch (getRunType()) {
 		case serial:
 			serialRun();
@@ -53,19 +62,19 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			eventRun();
 			break;
 		}
-		if (RunStatus.running.equals(status)) {
-			setStatus(RunStatus.success);
+		if (RunStatus.Running.equals(status)) {
+			setStatus(RunStatus.Success);
 		}
 	}
 
 	protected void serialRun() throws Exception {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
-			if (RunStatus.running.equals(status)) {
+			if (RunStatus.Running.equals(status)) {
 				run.run();
 			}
 			RunStatus status = run.getStatus();
-			if (RunStatus.fail.equals(status)) {
+			if (RunStatus.Fail.equals(status)) {
 				setStatus(status);
 				break;
 			}
@@ -80,12 +89,12 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 			for (Future<RunStatus> future : futures) {
 				try {
 					RunStatus status = future.get();
-					if (RunStatus.fail.equals(status)) {
-						setStatus(RunStatus.fail);
+					if (RunStatus.Fail.equals(status)) {
+						setStatus(RunStatus.Fail);
 					}
 				} catch (ExecutionException e) {
 					logger.error(e.getMessage(), e);
-					setStatus(RunStatus.fail);
+					setStatus(RunStatus.Fail);
 				}
 			}
 		} catch (InterruptedException e) {
@@ -97,7 +106,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		Lock lock = timeoutCheck.getLock();
 		lock.lock();
 		try {
-			while (RunStatus.running.equals(status)) {
+			while (RunStatus.Running.equals(status)) {
 				logger.info("eventRun wait...");
 				timeoutCheck.await();
 				logger.info("eventRun notify, status:{}", status);
@@ -116,20 +125,20 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void setEventRunStatus(RunStatus status) {
-		if (!RunType.event.equals(getRunType()) || !RunStatus.running.equals(this.status)) {
+		if (!RunType.event.equals(getRunType()) || !RunStatus.Running.equals(this.status)) {
 			return;
 		}
 		if (status == null) {
 			List<T> runs = getRuns();
-			boolean fail = runs.stream().anyMatch(run -> RunStatus.fail.equals(run.getStatus()));
+			boolean fail = runs.stream().anyMatch(run -> RunStatus.Fail.equals(run.getStatus()));
 			if (fail) {
-				setStatus(RunStatus.fail);
+				setStatus(RunStatus.Fail);
 				timeoutCheck.signalAll();
 				return;
 			}
-			boolean success = runs.stream().allMatch(run -> RunStatus.success.equals(run.getStatus()));
+			boolean success = runs.stream().allMatch(run -> RunStatus.Success.equals(run.getStatus()));
 			if (success) {
-				setStatus(RunStatus.success);
+				setStatus(RunStatus.Success);
 				timeoutCheck.signalAll();
 				return;
 			}
@@ -149,9 +158,9 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		ExecutorService pool = getExecutorService();
 		lock.lock();
 		try {
-			if (RunStatus.running.equals(status)) {
+			if (RunStatus.Running.equals(status)) {
 				Run run = runs.get(eventIndex);
-				if (!RunStatus.running.equals(run.getStatus())) {
+				if (!RunStatus.Running.equals(run.getStatus())) {
 					logger.info("eventRun run, index:{}", eventIndex);
 					pool.execute(() -> {
 						try {
@@ -175,19 +184,21 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	@Override
 	public void reset() {
 		getRuns().forEach(Run::reset);
-		setStatus(RunStatus.idle);
+		setStatus(RunStatus.Idle);
 		timeoutCheck.reset();
 	}
 
 	@Override
 	public void destroy() {
 		getRuns().forEach(Run::destroy);
-		setStatus(RunStatus.destory);
+		setStatus(RunStatus.Destory);
 	}
 
 	@Override
 	public double getProgress() {
-		double finish = getRuns().stream().filter(run -> RunStatus.success.equals(getStatus()) || RunStatus.fail.equals(getStatus())).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
+		//完成的进度
+		double finish = getRuns().stream().filter(run -> RunStatus.Success.equals(getStatus()) || RunStatus.Fail.equals(getStatus())).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
+		//所有的进度
 		double total = calculateRunDuration();
 		if (total == 0) {
 			logger.error("total duration is 0, total:{}, finish:{}", total, finish);
@@ -200,6 +211,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	@Override
 	public long calculateRunDuration() {
 		if (runDuration == null) {
+			//获取所有子节点，估算当前节点的运行时间
 			runDuration = getRuns().stream().map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
 		}
 		return runDuration;
