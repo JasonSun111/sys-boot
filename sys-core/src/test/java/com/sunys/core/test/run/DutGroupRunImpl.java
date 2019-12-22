@@ -6,17 +6,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.sunys.core.run.impl.AbstractGroupRun;
-import com.sunys.facade.run.GroupRun;
-import com.sunys.facade.run.Run;
 
-public class DutRunGroup extends AbstractGroupRun<Run> implements GroupRun<Run> {
+public class DutGroupRunImpl extends AbstractGroupRun<StepRun> implements DutGroupRun {
 
 	private ExecutorService executorService = Executors.newFixedThreadPool(8);
 	
-	private List<Run> steps = new ArrayList<>();
+	private List<StepRun> steps = new ArrayList<>();
 	
 	@Override
-	public List<Run> getRuns() {
+	public List<StepRun> getRuns() {
 		return steps;
 	}
 
@@ -25,11 +23,11 @@ public class DutRunGroup extends AbstractGroupRun<Run> implements GroupRun<Run> 
 		return executorService;
 	}
 
-	public List<Run> getSteps() {
+	public List<StepRun> getSteps() {
 		return steps;
 	}
 
-	public void setSteps(List<Run> steps) {
+	public void setSteps(List<StepRun> steps) {
 		this.steps = steps;
 	}
 

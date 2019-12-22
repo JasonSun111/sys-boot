@@ -101,6 +101,14 @@ public interface Run extends Callable<RunStatus> {
 	void reset();
 	
 	/**
+	 * 清空运行数据并重置对象状态
+	 */
+	default void cleanAndReset() {
+		clean();
+		reset();
+	}
+	
+	/**
 	 * 估算运行需要的时间
 	 * @return
 	 */

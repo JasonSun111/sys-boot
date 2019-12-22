@@ -47,6 +47,7 @@ public class RunInvocationHandler implements InvocationHandler {
 					RunMethodInterceptor interceptor = clazz.newInstance();
 					interceptors.add(interceptor);
 				}
+				//获取拦截器类名
 				String[] classNames = anno.classNames();
 				for (String className : classNames) {
 					//根据类名创建方法拦截器对象

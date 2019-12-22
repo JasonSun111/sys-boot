@@ -16,6 +16,7 @@ import com.sunys.core.test.bean.Dut;
 import com.sunys.core.test.bean.Step;
 import com.sunys.core.test.bean.Testcase;
 import com.sunys.core.test.conf.TestsConfiguration;
+import com.sunys.core.test.run.DutGroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.RunFactory;
 
@@ -60,7 +61,7 @@ public class SpringTests {
 			}
 			testcase.getDuts().add(dut);
 		}
-		RootGroupRun testcaseRun = RunFactory.getRun(testcase);
+		RootGroupRun<DutGroupRun> testcaseRun = RunFactory.getRun(testcase);
 		testcaseRun.run();
 	}
 }
