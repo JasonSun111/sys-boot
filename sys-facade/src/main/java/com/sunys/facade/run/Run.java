@@ -60,6 +60,12 @@ public interface Run extends Callable<RunStatus> {
 	RootGroupRun<? extends Run> getRoot();
 	
 	/**
+	 * 获取超时检测接口
+	 * @return
+	 */
+	TimeoutCheck getTimeoutCheck();
+	
+	/**
 	 * 创建对象后初始化
 	 * @throws Exception
 	 */

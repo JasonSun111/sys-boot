@@ -81,6 +81,11 @@ public abstract class AbstractTimeoutCheck implements TimeoutCheck {
 	}
 	
 	@Override
+	public void startCheckTimeout(Long timeout) {
+		startCheckTimeout(timeout, TimeUnit.SECONDS);
+	}
+	
+	@Override
 	public void startCheckTimeout(Long timeout, TimeUnit unit) {
 		if (timeout == null) {
 			timeout = getTimeout();

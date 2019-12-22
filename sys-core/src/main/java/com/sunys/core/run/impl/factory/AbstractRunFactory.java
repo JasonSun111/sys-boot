@@ -19,7 +19,7 @@ public abstract class AbstractRunFactory<T extends Run> implements RunFactory<T>
 	 * @param obj
 	 * @return
 	 */
-	public abstract T createRun(Object obj);
+	public abstract T createRun(Object obj) throws Exception;
 	
 	@Override
 	public T getInstance(Object obj) throws Exception {

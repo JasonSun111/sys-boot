@@ -100,6 +100,15 @@ public abstract class AbstractRun implements Run {
 	}
 
 	@Override
+	public TimeoutCheck getTimeoutCheck() {
+		return timeoutCheck;
+	}
+
+	public void setTimeoutCheck(TimeoutCheck timeoutCheck) {
+		this.timeoutCheck = timeoutCheck;
+	}
+
+	@Override
 	public RunStatus getStatus() {
 		return status;
 	}

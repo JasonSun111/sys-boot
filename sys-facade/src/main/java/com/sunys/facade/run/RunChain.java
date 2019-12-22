@@ -19,7 +19,9 @@ public class RunChain {
 	private Object[] args;
 
 	public RunChain(List<RunMethodInterceptor> interceptors, Run run, Method method, Object... args) {
-		this.listIterator = interceptors.listIterator();
+		if (interceptors != null) {
+			this.listIterator = interceptors.listIterator();
+		}
 		this.run = run;
 		this.method = method;
 		this.args = args;
@@ -32,7 +34,7 @@ public class RunChain {
 	 */
 	public Object invoke() throws Exception {
 		Object obj = null;
-		if (listIterator.hasNext()) {
+		if (listIterator != null && listIterator.hasNext()) {
 			//如果有拦截器，先执行拦截器
 			RunMethodInterceptor interceptor = listIterator.next();
 			obj = interceptor.intercept(this);

@@ -3,7 +3,9 @@ package com.sunys.core.run.impl.factory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,20 +25,21 @@ public class RunInvocationHandler implements InvocationHandler {
 	
 	private Map<Method, List<RunMethodInterceptor>> interceptorsMap = new HashMap<>();
 	
-	public RunInvocationHandler(Run run) throws InstantiationException, IllegalAccessException {
+	public RunInvocationHandler(Run run) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		this.run = run;
 		init();
 	}
 
-	private void init() throws InstantiationException, IllegalAccessException {
-		//获取对象所以方法
-		Method[] methods = run.getClass().getMethods();
-		for (Method method : methods) {
+	private void init() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		//获取对象所有方法
+		Iterator<Method> it = Arrays.stream(run.getClass().getInterfaces()).flatMap(inter -> Arrays.stream(inter.getMethods())).iterator();
+		while (it.hasNext()) {
+			Method method = it.next();
 			method.setAccessible(true);
 			//获取方法上的Interceptor注解
 			Interceptor anno = method.getAnnotation(Interceptor.class);
+			List<RunMethodInterceptor> interceptors = new ArrayList<>();
 			if (anno != null) {
-				List<RunMethodInterceptor> interceptors = new ArrayList<>();
 				//获取注解上的拦截器类型
 				Class<? extends RunMethodInterceptor>[] value = anno.value();
 				for (Class<? extends RunMethodInterceptor> clazz : value) {
@@ -44,8 +47,15 @@ public class RunInvocationHandler implements InvocationHandler {
 					RunMethodInterceptor interceptor = clazz.newInstance();
 					interceptors.add(interceptor);
 				}
-				interceptorsMap.put(method, interceptors);
+				String[] classNames = anno.classNames();
+				for (String className : classNames) {
+					//根据类名创建方法拦截器对象
+					Class<?> clazz = Class.forName(className);
+					RunMethodInterceptor interceptor = (RunMethodInterceptor) clazz.newInstance();
+					interceptors.add(interceptor);
+				}
 			}
+			interceptorsMap.put(method, interceptors);
 		}
 	}
 

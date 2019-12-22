@@ -11,5 +11,7 @@ import com.sunys.facade.run.RunMethodInterceptor;
 @Target(ElementType.METHOD)
 public @interface Interceptor {
 
-	Class<? extends RunMethodInterceptor>[] value();
+	Class<? extends RunMethodInterceptor>[] value() default {};
+	
+	String[] classNames() default {};
 }

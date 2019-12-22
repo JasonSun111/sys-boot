@@ -39,19 +39,11 @@ public interface GroupRun<T extends Run> extends Run {
 	 * @param list
 	 */
 	default void recursion(Class<? extends Run> clazz, Predicate<Run> predicate, List<Run> list) {
-		List<T> runs = getRuns();
-		for (T run : runs) {
-			if (clazz.isInstance(runs)) {
-				if (predicate != null && predicate.test(run)) {
-					list.add(run);
-				} else if (predicate == null) {
-					list.add(run);
-				}
+		recursion(clazz, run -> {
+			if (predicate.test(run)) {
+				list.add(run);
 			}
-			if (run instanceof GroupRun) {
-				recursion(clazz, list);
-			}
-		}
+		});
 	}
 	
 	/**
@@ -66,7 +58,8 @@ public interface GroupRun<T extends Run> extends Run {
 				consumer.accept(run);
 			}
 			if (run instanceof GroupRun) {
-				recursion(clazz, consumer);
+				GroupRun<? extends Run> groupRun = (GroupRun) run;
+				groupRun.recursion(clazz, consumer);
 			}
 		}
 	}
