@@ -54,7 +54,7 @@ public interface GroupRun<T extends Run> extends Run {
 	default void recursion(Class<? extends Run> clazz, Consumer<Run> consumer) {
 		List<T> runs = getRuns();
 		for (T run : runs) {
-			if (clazz.isInstance(runs)) {
+			if (clazz.isInstance(run)) {
 				consumer.accept(run);
 			}
 			if (run instanceof GroupRun) {
