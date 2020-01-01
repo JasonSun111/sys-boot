@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.Run;
-import com.sunys.facade.run.RunStatus;
-import com.sunys.facade.run.RunType;
 
 /**
  * AbstractGroupRun
@@ -23,22 +21,20 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractGroupRun.class);
 
-	protected List<Future<RunStatus>> futures;
-
-	protected RunType runType = RunType.serial;
+	protected byte runType = RUNTYPE_SERIAL;
 
 	@Override
 	public void init() throws Exception {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
 			run.init();
-			if (!RunStatus.Idle.equals(run.getStatus())) {
+			if (STATUS_IDLE != run.getStatus()) {
 				status = run.getStatus();
 				break;
 			}
 		}
-		if (status == null) {
-			status = RunStatus.Idle;
+		if (status == STATUS_NONE) {
+			status = STATUS_IDLE;
 		}
 	}
 
@@ -50,31 +46,31 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void run() throws Exception {
-		setStatus(RunStatus.Running);
+		setStatus(STATUS_RUNNING);
 		switch (getRunType()) {
-		case serial:
+		case RUNTYPE_SERIAL:
 			serialRun();
 			break;
-		case parallel:
+		case RUNTYPE_PARALLEL:
 			parallelRun();
 			break;
-		case event:
+		case RUNTYPE_EVENT:
 			eventRun();
 			break;
 		}
-		if (RunStatus.Running.equals(status)) {
-			setStatus(RunStatus.Success);
+		if (STATUS_RUNNING == status) {
+			setStatus(STATUS_SUCCESS);
 		}
 	}
 
 	protected void serialRun() throws Exception {
 		List<T> runs = getRuns();
 		for (Run run : runs) {
-			if (RunStatus.Running.equals(status)) {
+			if (STATUS_RUNNING == status) {
 				run.run();
 			}
-			RunStatus status = run.getStatus();
-			if (RunStatus.Fail.equals(status)) {
+			byte status = run.getStatus();
+			if (STATUS_FAIL == status) {
 				setStatus(status);
 				break;
 			}
@@ -85,16 +81,16 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		List<T> runs = getRuns();
 		ExecutorService pool = getExecutorService();
 		try {
-			futures = pool.invokeAll(runs);
-			for (Future<RunStatus> future : futures) {
+			List<Future<Byte>> futures = pool.invokeAll(runs);
+			for (Future<Byte> future : futures) {
 				try {
-					RunStatus status = future.get();
-					if (RunStatus.Fail.equals(status)) {
-						setStatus(RunStatus.Fail);
+					Byte status = future.get();
+					if (STATUS_FAIL == status) {
+						setStatus(STATUS_FAIL);
 					}
 				} catch (ExecutionException e) {
 					logger.error(e.getMessage(), e);
-					setStatus(RunStatus.Fail);
+					setStatus(STATUS_FAIL);
 				}
 			}
 		} catch (InterruptedException e) {
@@ -106,7 +102,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		Lock lock = timeoutCheck.getLock();
 		lock.lock();
 		try {
-			while (RunStatus.Running.equals(status)) {
+			while (STATUS_RUNNING == status) {
 				logger.info("eventRun wait...");
 				timeoutCheck.await();
 				logger.info("eventRun notify, status:{}", status);
@@ -124,21 +120,21 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	@Override
-	public void setEventRunStatus(RunStatus status) {
-		if (!RunType.event.equals(getRunType()) || !RunStatus.Running.equals(this.status)) {
+	public void setEventRunStatus(Byte status) {
+		if (RUNTYPE_EVENT != getRunType() || STATUS_RUNNING != this.status) {
 			return;
 		}
 		if (status == null) {
 			List<T> runs = getRuns();
-			boolean fail = runs.stream().anyMatch(run -> RunStatus.Fail.equals(run.getStatus()));
+			boolean fail = runs.stream().anyMatch(run -> STATUS_FAIL == run.getStatus());
 			if (fail) {
-				setStatus(RunStatus.Fail);
+				setStatus(STATUS_FAIL);
 				timeoutCheck.signalAll();
 				return;
 			}
-			boolean success = runs.stream().allMatch(run -> RunStatus.Success.equals(run.getStatus()));
+			boolean success = runs.stream().allMatch(run -> STATUS_SUCCESS == run.getStatus());
 			if (success) {
-				setStatus(RunStatus.Success);
+				setStatus(STATUS_SUCCESS);
 				timeoutCheck.signalAll();
 				return;
 			}
@@ -150,7 +146,7 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 
 	@Override
 	public void eventRun(int eventIndex) {
-		if (!RunType.event.equals(getRunType())) {
+		if (RUNTYPE_EVENT != getRunType()) {
 			return;
 		}
 		Lock lock = timeoutCheck.getLock();
@@ -158,9 +154,9 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 		ExecutorService pool = getExecutorService();
 		lock.lock();
 		try {
-			if (RunStatus.Running.equals(status)) {
+			if (STATUS_RUNNING == status) {
 				Run run = runs.get(eventIndex);
-				if (!RunStatus.Running.equals(run.getStatus())) {
+				if (STATUS_RUNNING != run.getStatus()) {
 					logger.info("eventRun run, index:{}", eventIndex);
 					pool.execute(() -> {
 						try {
@@ -184,20 +180,20 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	@Override
 	public void reset() {
 		getRuns().forEach(Run::reset);
-		setStatus(RunStatus.Idle);
+		setStatus(STATUS_IDLE);
 		timeoutCheck.reset();
 	}
 
 	@Override
 	public void destroy() {
 		getRuns().forEach(Run::destroy);
-		setStatus(RunStatus.Destory);
+		setStatus(STATUS_DESTROY);
 	}
 
 	@Override
 	public double getProgress() {
 		//完成的进度
-		double finish = getRuns().stream().filter(run -> RunStatus.Success.equals(getStatus()) || RunStatus.Fail.equals(getStatus())).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
+		double finish = getRuns().stream().filter(run -> STATUS_SUCCESS == getStatus() || STATUS_FAIL == getStatus()).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
 		//所有的进度
 		double total = calculateRunDuration();
 		if (total == 0) {
@@ -218,11 +214,11 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	@Override
-	public RunType getRunType() {
+	public byte getRunType() {
 		return runType;
 	}
 
-	public void setRunType(RunType runType) {
+	public void setRunType(byte runType) {
 		this.runType = runType;
 	}
 

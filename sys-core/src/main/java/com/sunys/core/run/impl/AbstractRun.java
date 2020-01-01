@@ -6,7 +6,6 @@ import java.util.concurrent.locks.Lock;
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
-import com.sunys.facade.run.RunStatus;
 import com.sunys.facade.run.TimeoutCheck;
 
 /**
@@ -24,7 +23,7 @@ public abstract class AbstractRun implements Run {
 	
 	protected String name;
 	
-	protected volatile RunStatus status;
+	protected volatile byte status = STATUS_NONE;
 	
 	protected GroupRun<? extends Run> parent;
 	
@@ -109,11 +108,11 @@ public abstract class AbstractRun implements Run {
 	}
 
 	@Override
-	public RunStatus getStatus() {
+	public byte getStatus() {
 		return status;
 	}
 
-	public void setStatus(RunStatus status) {
+	public void setStatus(byte status) {
 		Lock lock = timeoutCheck.getLock();
 		lock.lock();
 		try {

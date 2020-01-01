@@ -7,8 +7,17 @@ import java.util.concurrent.Callable;
  * @author sunys
  * @date Dec 21, 2019
  */
-public interface Run extends Callable<RunStatus> {
+public interface Run extends Callable<Byte> {
 
+	byte STATUS_NONE = 0;
+	byte STATUS_IDLE = 1;
+	byte STATUS_STARTING = 2;
+	byte STATUS_RUNNING = 3;
+	byte STATUS_SUCCESS = 4;
+	byte STATUS_FAIL = 5;
+	byte STATUS_STOPING = 6;
+	byte STATUS_DESTROY = 7;
+	
 	/**
 	 * 获取id
 	 * @return
@@ -37,7 +46,7 @@ public interface Run extends Callable<RunStatus> {
 	 * 获取运行状态
 	 * @return
 	 */
-	RunStatus getStatus();
+	byte getStatus();
 	
 	/**
 	 * 获取多层上级节点
@@ -78,7 +87,7 @@ public interface Run extends Callable<RunStatus> {
 	void run() throws Exception;
 	
 	@Override
-	default RunStatus call() throws Exception {
+	default Byte call() throws Exception {
 		//获取当前对象的代理
 		Run proxy = getProxy();
 		if (proxy != null) {

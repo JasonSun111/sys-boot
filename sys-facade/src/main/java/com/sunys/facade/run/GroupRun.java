@@ -11,11 +11,15 @@ import java.util.function.Predicate;
  */
 public interface GroupRun<T extends Run> extends Run {
 
+	byte RUNTYPE_SERIAL = 1;
+	byte RUNTYPE_PARALLEL = 2;
+	byte RUNTYPE_EVENT = 3;
+	
 	/**
 	 * 运行类型
 	 * @return
 	 */
-	RunType getRunType();
+	byte getRunType();
 	
 	/**
 	 * 组里面包含的run对象
@@ -85,5 +89,5 @@ public interface GroupRun<T extends Run> extends Run {
 	 * RunType是event时，设置状态，结束运行
 	 * @param status
 	 */
-	void setEventRunStatus(RunStatus status);
+	void setEventRunStatus(Byte status);
 }

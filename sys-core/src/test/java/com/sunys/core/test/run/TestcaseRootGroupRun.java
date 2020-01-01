@@ -9,22 +9,21 @@ import java.util.concurrent.Executors;
 
 import com.sunys.core.run.impl.AbstractGroupRun;
 import com.sunys.core.test.bean.Testcase;
-import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 
-public class TestcaseRootGroupRun extends AbstractGroupRun<GroupRun<Run>> implements RootGroupRun<GroupRun<Run>> {
+public class TestcaseRootGroupRun extends AbstractGroupRun<DutGroupRun> implements RootGroupRun<DutGroupRun> {
 
 	private ExecutorService executorService = Executors.newFixedThreadPool(8);
 	
 	private Testcase testcase;
 	
-	private List<GroupRun<Run>> duts = new ArrayList<>();
+	private List<DutGroupRun> duts = new ArrayList<>();
 
 	private Map<Long, Run> runMap = new HashMap<>();
 	
 	@Override
-	public List<GroupRun<Run>> getRuns() {
+	public List<DutGroupRun> getRuns() {
 		return duts;
 	}
 
@@ -50,11 +49,11 @@ public class TestcaseRootGroupRun extends AbstractGroupRun<GroupRun<Run>> implem
 		this.testcase = testcase;
 	}
 
-	public List<GroupRun<Run>> getDuts() {
+	public List<DutGroupRun> getDuts() {
 		return duts;
 	}
 
-	public void setDuts(List<GroupRun<Run>> duts) {
+	public void setDuts(List<DutGroupRun> duts) {
 		this.duts = duts;
 	}
 
