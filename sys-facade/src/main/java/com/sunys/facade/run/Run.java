@@ -118,12 +118,6 @@ public interface Run extends Callable<Byte> {
 	}
 	
 	/**
-	 * 估算运行需要的时间
-	 * @return
-	 */
-	long calculateRunDuration();
-	
-	/**
 	 * 销毁对象调用
 	 */
 	void destroy();

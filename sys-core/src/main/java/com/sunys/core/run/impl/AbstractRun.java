@@ -29,8 +29,6 @@ public abstract class AbstractRun implements Run {
 	
 	protected RootGroupRun<? extends Run> root;
 	
-	protected Long runDuration;
-
 	protected TimeoutCheck timeoutCheck;
 
 	public AbstractRun() {

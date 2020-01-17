@@ -75,12 +75,6 @@ public interface GroupRun<T extends Run> extends Run {
 	void eventRun(int eventIndex);
 	
 	/**
-	 * 获取当前运行的进度
-	 * @return
-	 */
-	double getProgress();
-	
-	/**
 	 * RunType是event时，设置状态，结束运行
 	 */
 	void setEventRunStatus();

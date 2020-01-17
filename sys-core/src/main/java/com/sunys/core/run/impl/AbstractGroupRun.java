@@ -191,29 +191,6 @@ public abstract class AbstractGroupRun<T extends Run> extends AbstractRun implem
 	}
 
 	@Override
-	public double getProgress() {
-		//完成的进度
-		double finish = getRuns().stream().filter(run -> STATUS_SUCCESS == getStatus() || STATUS_FAIL == getStatus()).map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
-		//所有的进度
-		double total = calculateRunDuration();
-		if (total == 0) {
-			logger.error("total duration is 0, total:{}, finish:{}", total, finish);
-			return 0;
-		}
-		double result = finish * 100 / total;
-		return result;
-	}
-
-	@Override
-	public long calculateRunDuration() {
-		if (runDuration == null) {
-			//获取所有子节点，估算当前节点的运行时间
-			runDuration = getRuns().stream().map(Run::calculateRunDuration).reduce(0L, (v1, v2) -> v1 + v2);
-		}
-		return runDuration;
-	}
-
-	@Override
 	public byte getRunType() {
 		return runType;
 	}

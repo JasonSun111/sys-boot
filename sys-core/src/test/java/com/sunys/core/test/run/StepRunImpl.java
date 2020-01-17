@@ -31,12 +31,6 @@ public class StepRunImpl extends AbstractRun implements StepRun {
 	}
 
 	@Override
-	public long calculateRunDuration() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
 		
