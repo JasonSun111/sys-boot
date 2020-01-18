@@ -5,9 +5,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.sunys.facade.annotation.Interceptor;
 import com.sunys.facade.run.Run;
@@ -32,7 +34,7 @@ public class RunInvocationHandler implements InvocationHandler {
 
 	private void init() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		//获取对象所有方法
-		Iterator<Method> it = Arrays.stream(run.getClass().getInterfaces()).flatMap(inter -> Arrays.stream(inter.getMethods())).iterator();
+		Iterator<Method> it = getAllInterfaceSet(run.getClass()).stream().flatMap(inter -> Arrays.stream(inter.getMethods())).iterator();
 		while (it.hasNext()) {
 			Method method = it.next();
 			method.setAccessible(true);
@@ -68,6 +70,38 @@ public class RunInvocationHandler implements InvocationHandler {
 		//执行拦截器和目标方法
 		Object obj = runChain.invoke();
 		return obj;
+	}
+
+	/**
+	 * 获取实现的所有接口
+	 * @param clazz
+	 * @return
+	 */
+	public static Class<?>[] getAllInterfaceArray(Class<?> clazz) {
+		Set<Class<?>> set = getAllInterfaceSet(clazz);
+		return set.toArray(new Class[set.size()]);
+	}
+
+	/**
+	 * 获取实现的所有接口
+	 * @param clazz
+	 * @return
+	 */
+	public static Set<Class<?>> getAllInterfaceSet(Class<?> clazz) {
+		Set<Class<?>> set = new HashSet<Class<?>>();
+		addInterfaceClass(set, clazz);
+		while (Object.class.equals(clazz)) {
+			clazz = clazz.getSuperclass();
+			addInterfaceClass(set, clazz);
+		}
+		return set;
+	}
+
+	private static void addInterfaceClass(Set<Class<?>> set, Class<?> clazz) {
+		Class<?>[] classes = clazz.getInterfaces();
+		for (Class<?> c : classes) {
+			set.add(c);
+		}
 	}
 
 }

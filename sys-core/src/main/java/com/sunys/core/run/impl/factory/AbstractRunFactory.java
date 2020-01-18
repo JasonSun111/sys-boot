@@ -38,7 +38,7 @@ public abstract class AbstractRunFactory<T extends Run> implements RunFactory<T>
 	 * @throws Exception
 	 */
 	private T getProxy(T run) throws Exception {
-		Class<?> proxyClass = Proxy.getProxyClass(run.getClass().getClassLoader(), run.getClass().getInterfaces());
+		Class<?> proxyClass = Proxy.getProxyClass(run.getClass().getClassLoader(), RunInvocationHandler.getAllInterfaceArray(run.getClass()));
 		InvocationHandler invocationHandler = new RunInvocationHandler(run);
 		Constructor<?> constructor = proxyClass.getConstructor(InvocationHandler.class);
 		Object obj = constructor.newInstance(invocationHandler);
