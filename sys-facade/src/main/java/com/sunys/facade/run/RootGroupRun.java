@@ -1,7 +1,5 @@
 package com.sunys.facade.run;
 
-import java.util.Map;
-
 /**
  * RootGroupRun
  * @author sunys
@@ -10,8 +8,10 @@ import java.util.Map;
 public interface RootGroupRun<T extends Run> extends GroupRun<T> {
 
 	/**
-	 * 获取所有的子节点
+	 * 根据id获取
+	 * @param id
 	 * @return
 	 */
-	Map<Long, Run> runMap();
+	Run getRun(long id);
+
 }
