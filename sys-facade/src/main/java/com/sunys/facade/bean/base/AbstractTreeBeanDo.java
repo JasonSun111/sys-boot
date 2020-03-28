@@ -1,11 +1,11 @@
-package com.sunys.facade.bean;
+package com.sunys.facade.bean.base;
 
 /**
- * TreeBean
+ * AbstractTreeBeanDo
  * @author sunys
  * @date 2019年1月4日
  */
-public class TreeBean extends AbstractBean {
+public abstract class AbstractTreeBeanDo extends AbstractBeanDo implements TreeDo {
 
 	private static final long serialVersionUID = 9036192868970712989L;
 
@@ -13,26 +13,32 @@ public class TreeBean extends AbstractBean {
 	private String codeName;
 	private String parentCode;
 
+	@Override
 	public String getCodeId() {
 		return codeId;
 	}
 
+	@Override
 	public void setCodeId(String codeId) {
 		this.codeId = codeId;
 	}
 
+	@Override
 	public String getCodeName() {
 		return codeName;
 	}
 
+	@Override
 	public void setCodeName(String codeName) {
 		this.codeName = codeName;
 	}
 
+	@Override
 	public String getParentCode() {
 		return parentCode;
 	}
 
+	@Override
 	public void setParentCode(String parentCode) {
 		this.parentCode = parentCode;
 	}
@@ -54,7 +60,7 @@ public class TreeBean extends AbstractBean {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TreeBean other = (TreeBean) obj;
+		AbstractTreeBeanDo other = (AbstractTreeBeanDo) obj;
 		if (codeId == null) {
 			if (other.codeId != null)
 				return false;

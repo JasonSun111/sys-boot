@@ -3,14 +3,14 @@ package com.sunys.core.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.sunys.facade.bean.AbstractBean;
+import com.sunys.facade.bean.base.BaseDo;
 
 /**
  * BaseDao
  * @author sunys
  * @date 2019年1月4日
  */
-public interface BaseDao<T extends AbstractBean> {
+public interface BaseDao<Do extends BaseDo> {
 
 	/**
 	 * 根据id查询数据
@@ -18,7 +18,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	T getById(Long pkid) throws Exception;
+	Do getById(Long pkid) throws Exception;
 
 	/**
 	 * 根据一定的条件查询出列表
@@ -26,7 +26,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	List<T> listBy(Map<String, Object> params) throws Exception;
+	List<Do> listBy(Map<String, Object> params) throws Exception;
 	
 	/**
 	 * 根据条件查询出符合条件的个数
@@ -42,7 +42,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	List<T> pageList(Map<String, Object> params) throws Exception;
+	List<Do> pageList(Map<String, Object> params) throws Exception;
 
 	/**
 	 * 根据条件查询出分页的总条数
@@ -58,7 +58,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	int insert(T entity) throws Exception;
+	int insert(Do entity) throws Exception;
 
 	/**
 	 * 插入列表的所有记录
@@ -66,7 +66,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	int insertAll(List<T> list) throws Exception;
+	int insertAll(List<Do> list) throws Exception;
 
 	/**
 	 * 根据id更新所有字段
@@ -74,7 +74,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	int update(T entity) throws Exception;
+	int update(Do entity) throws Exception;
 
 	/**
 	 * 根据id更新参数中不为空的字段
@@ -82,7 +82,7 @@ public interface BaseDao<T extends AbstractBean> {
 	 * @return
 	 * @throws Exception
 	 */
-	int updateIf(T entity) throws Exception;
+	int updateIf(Do entity) throws Exception;
 
 	/**
 	 * 根据id删除一条记录

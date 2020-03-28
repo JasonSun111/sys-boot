@@ -13,11 +13,10 @@ import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunFactory;
 
-public class TestcaseRunFactory extends AbstractRunFactory<RootGroupRun<DutGroupRun>> {
+public class TestcaseRunFactory extends AbstractRunFactory<RootGroupRun<DutGroupRun>, Testcase> {
 
 	@Override
-	public RootGroupRun<DutGroupRun> createRun(Object obj) throws Exception {
-		Testcase testcase = (Testcase) obj;
+	public RootGroupRun<DutGroupRun> createRun(Testcase testcase) throws Exception {
 		TestcaseRootGroupRun testcaseRun = new TestcaseRootGroupRun();
 		List<Dut> duts = testcase.getDuts();
 		for (Dut dut : duts) {

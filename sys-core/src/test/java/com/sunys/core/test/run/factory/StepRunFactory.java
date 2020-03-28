@@ -6,11 +6,10 @@ import com.sunys.core.test.run.StepRun;
 import com.sunys.core.test.run.StepRunImpl;
 import com.sunys.core.test.run.TimeoutCheckImpl;
 
-public class StepRunFactory extends AbstractRunFactory<StepRun> {
+public class StepRunFactory extends AbstractRunFactory<StepRun, Step> {
 
 	@Override
-	public StepRun createRun(Object obj) {
-		Step step = (Step) obj;
+	public StepRun createRun(Step step) {
 		StepRunImpl stepRun = new StepRunImpl();
 		stepRun.setStep(step);
 		stepRun.setTimeoutCheck(new TimeoutCheckImpl(8, null));

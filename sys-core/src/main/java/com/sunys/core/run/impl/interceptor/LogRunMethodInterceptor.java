@@ -18,7 +18,7 @@ public class LogRunMethodInterceptor implements RunMethodInterceptor {
 	
 	@Override
 	public Object intercept(RunChain runChain) throws Exception {
-		Run run = runChain.getRun();
+		Run run = runChain.getTarget();
 		String methodName = runChain.getMethod().getName();
 		logger.info("Class:{}, method:{}, name:{}, id:{}, run start", run.getClass().getSimpleName(), methodName, run.getName(), run.getId());
 		Object obj = runChain.invoke();

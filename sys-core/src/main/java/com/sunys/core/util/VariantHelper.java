@@ -355,31 +355,43 @@ public class VariantHelper {
 	 * @param clazz
 	 * @return
 	 */
-	public static Object parseValue(Object value,Class clazz){
-		if (clazz.equals(String.class))
+	public static Object parseValue(Object value, Class<?> clazz) {
+		if (clazz.equals(String.class)) {
 			return parseString(value);
-		if (clazz.equals(BigDecimal.class))
+		}
+		if (clazz.equals(BigDecimal.class)) {
 			return parseBigDecimal(value);
-		if (clazz.equals(Boolean.class))
+		}
+		if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
 			return parseBoolean(value);
-		if (clazz.equals(Byte.class) || clazz.equals(byte.class))
+		}
+		if (clazz.equals(Byte.class) || clazz.equals(byte.class)) {
 			return parseByte(value);
-		if (clazz.equals(java.util.Date.class))
+		}
+		if (clazz.equals(java.util.Date.class)) {
 			return parseDate(value);
-		if (clazz.equals(java.sql.Date.class))
+		}
+		if (clazz.equals(java.sql.Date.class)) {
 			return parseSqlDate(value);
-		if (clazz.equals(java.sql.Time.class))
+		}
+		if (clazz.equals(java.sql.Time.class)) {
 			return parseTime(value);
-		if (clazz.equals(Double.class) || clazz.equals(double.class))
+		}
+		if (clazz.equals(Double.class) || clazz.equals(double.class)) {
 			return parseDouble(value);
-		if (clazz.equals(Float.class) || clazz.equals(float.class))
+		}
+		if (clazz.equals(Float.class) || clazz.equals(float.class)) {
 			return parseFloat(value);
-		if (clazz.equals(Integer.class) || clazz.equals(int.class))
+		}
+		if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
 			return parseInt(value);
-		if (clazz.equals(Long.class) || clazz.equals(long.class))
+		}
+		if (clazz.equals(Long.class) || clazz.equals(long.class)) {
 			return parseLong(value);
-		if (clazz.equals(Short.class) || clazz.equals(short.class))
+		}
+		if (clazz.equals(Short.class) || clazz.equals(short.class)) {
 			return parseShort(value);
+		}
 		return value;
 	}
 

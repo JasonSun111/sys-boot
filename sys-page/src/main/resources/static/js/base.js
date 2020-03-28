@@ -544,7 +544,7 @@ define("base",function(require, exports, module){
 			contentType:requestOption.contentType ? requestOption.contentType : "application/x-www-form-urlencoded",
 			dataType:"json",
 			success:function(resultBean){
-				if(resultBean.status){
+				if(resultBean.status == 0){
 					def.resolve(resultBean.result);
 				}else{
 					var error = resultBean.errorData;
@@ -588,7 +588,7 @@ define("base",function(require, exports, module){
 			cache : false,
 			dataType:"json",
 			success:function(resultBean){
-				if(resultBean.status){
+				if(resultBean.status == 0){
 					def.resolve(resultBean.result);
 				}else{
 					var error = resultBean.errorData;

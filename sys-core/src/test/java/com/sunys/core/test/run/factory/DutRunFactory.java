@@ -12,11 +12,10 @@ import com.sunys.core.test.run.TimeoutCheckImpl;
 import com.sunys.facade.run.GroupRun;
 import com.sunys.facade.run.RunFactory;
 
-public class DutRunFactory extends AbstractRunFactory<DutGroupRun> {
+public class DutRunFactory extends AbstractRunFactory<DutGroupRun, Dut> {
 
 	@Override
-	public DutGroupRun createRun(Object obj) throws Exception {
-		Dut dut = (Dut) obj;
+	public DutGroupRun createRun(Dut dut) throws Exception {
 		DutGroupRunImpl dutRun = new DutGroupRunImpl();
 		List<Step> steps = dut.getSteps();
 		for (Step step : steps) {

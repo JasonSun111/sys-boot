@@ -2,12 +2,14 @@ package com.sunys.facade.bean;
 
 import java.util.List;
 
+import com.sunys.facade.bean.base.BaseDo;
+
 /**
  * PageBean
  * @author sunys
  * @date 2019年1月4日
  */
-public class PageBean<T extends AbstractBean> {
+public class PageBean<T extends BaseDo> {
 
 	//总条数
 	private int totalCount;
