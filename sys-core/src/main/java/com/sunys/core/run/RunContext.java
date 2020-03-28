@@ -29,7 +29,7 @@ public class RunContext {
 	public static void pushRun(Run run) {
 		LinkedList<Run> linkedList = getStack();
 		linkedList.push(run);
-		logger.info("RunContext push Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
+		logger.info("RunContext push Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getId());
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class RunContext {
 		if (linkedList.size() == 0) {
 			runThreadLocal.remove();
 		}
-		logger.info("RunContext pop Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getName(), run.getId());
+		logger.info("RunContext pop Run, Class:{}, name:{}, id:{}", run.getClass().getSimpleName(), run.getId());
 	}
 	
 	/**

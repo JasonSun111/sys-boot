@@ -55,12 +55,6 @@ public class HttpRunImpl implements HttpRun {
 	}
 
 	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Run getProxy() {
 		// TODO Auto-generated method stub
 		return null;
@@ -70,12 +64,6 @@ public class HttpRunImpl implements HttpRun {
 	public void setProxy(Run proxy) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public byte getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -94,42 +82,6 @@ public class HttpRunImpl implements HttpRun {
 	public RootGroupRun<? extends Run> getRoot() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public TimeoutCheck getTimeoutCheck() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void init() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void run() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clean() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
