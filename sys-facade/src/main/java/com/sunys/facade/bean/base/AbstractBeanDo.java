@@ -1,14 +1,13 @@
-package com.sunys.facade.bean;
+package com.sunys.facade.bean.base;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * AbstractBean
+ * AbstractBeanDo
  * @author sunys
  * @date 2019年1月4日
  */
-public abstract class AbstractBean implements Serializable {
+public abstract class AbstractBeanDo implements BaseDo {
 
 	private static final long serialVersionUID = -7361003408776086219L;
 
@@ -18,42 +17,52 @@ public abstract class AbstractBean implements Serializable {
 	private Date updateOn;
 	private String updateBy;
 
+	@Override
 	public Long getPkid() {
 		return pkid;
 	}
 
+	@Override
 	public void setPkid(Long pkid) {
 		this.pkid = pkid;
 	}
 
+	@Override
 	public Date getCreateOn() {
 		return createOn;
 	}
 
+	@Override
 	public void setCreateOn(Date createOn) {
 		this.createOn = createOn;
 	}
 
+	@Override
 	public String getCreateBy() {
 		return createBy;
 	}
 
+	@Override
 	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
 	}
 
+	@Override
 	public Date getUpdateOn() {
 		return updateOn;
 	}
 
+	@Override
 	public void setUpdateOn(Date updateOn) {
 		this.updateOn = updateOn;
 	}
 
+	@Override
 	public String getUpdateBy() {
 		return updateBy;
 	}
 
+	@Override
 	public void setUpdateBy(String updateBy) {
 		this.updateBy = updateBy;
 	}
@@ -74,7 +83,7 @@ public abstract class AbstractBean implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractBean other = (AbstractBean) obj;
+		AbstractBeanDo other = (AbstractBeanDo) obj;
 		if (pkid == null) {
 			if (other.pkid != null)
 				return false;

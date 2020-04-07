@@ -14,7 +14,7 @@ public class ContextRunMethodInterceptor implements RunMethodInterceptor {
 
 	@Override
 	public Object intercept(RunChain runChain) throws Exception {
-		Run run = runChain.getRun();
+		Run run = runChain.getTarget();
 		//设置当前线程运行的run接口
 		RunContext.pushRun(run);
 		try {

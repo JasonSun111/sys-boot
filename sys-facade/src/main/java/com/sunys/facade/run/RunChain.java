@@ -1,8 +1,6 @@
 package com.sunys.facade.run;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * 封装了调用一次接口方法需要执行的拦截器和目标方法
@@ -10,51 +8,37 @@ import java.util.ListIterator;
  * @author sunys
  * @date Dec 21, 2019
  */
-public class RunChain {
-
-	private ListIterator<RunMethodInterceptor> listIterator;
-
-	private Run run;
-	private Method method;
-	private Object[] args;
-
-	public RunChain(List<RunMethodInterceptor> interceptors, Run run, Method method, Object... args) {
-		if (interceptors != null) {
-			this.listIterator = interceptors.listIterator();
-		}
-		this.run = run;
-		this.method = method;
-		this.args = args;
-	}
+public interface RunChain {
 
 	/**
 	 * 执行拦截器栈和目标方法
 	 * @return
 	 * @throws Exception
 	 */
-	public Object invoke() throws Exception {
-		Object obj = null;
-		if (listIterator != null && listIterator.hasNext()) {
-			//如果有拦截器，先执行拦截器
-			RunMethodInterceptor interceptor = listIterator.next();
-			obj = interceptor.intercept(this);
-		} else {
-			//如果没有拦截器，执行目标方法
-			obj = method.invoke(run, args);
-		}
-		return obj;
-	}
+	Object invoke() throws Exception;
 
-	public Run getRun() {
-		return run;
-	}
+	/**
+	 * 获取目标对象
+	 * @return
+	 */
+	Run getTarget();
 
-	public Method getMethod() {
-		return method;
-	}
+	/**
+	 * 获取代理对象
+	 * @return
+	 */
+	Run getProxy();
 
-	public Object[] getArgs() {
-		return args;
-	}
+	/**
+	 * 获取目标的方法
+	 * @return
+	 */
+	Method getMethod();
+
+	/**
+	 * 方法传入的参数
+	 * @return
+	 */
+	Object[] getArgs();
 
 }

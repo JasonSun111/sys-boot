@@ -2,9 +2,9 @@ package com.sunys.core.util;
 
 import java.util.List;
 
-import com.sunys.facade.bean.AbstractBean;
 import com.sunys.facade.bean.PageBean;
 import com.sunys.facade.bean.PageParam;
+import com.sunys.facade.bean.base.BaseDo;
 
 /**
  * 分页工具类
@@ -62,7 +62,7 @@ public class PageUtils {
 	 * @param pageParam
 	 * @return
 	 */
-	public static <T extends AbstractBean> PageBean<T> getPageBean(List<T> list,int totalCount,PageParam pageParam){
+	public static <T extends BaseDo> PageBean<T> getPageBean(List<T> list,int totalCount,PageParam pageParam){
 		PageBean<T> pageBean = new PageBean<>();
 		pageBean.setRecordList(list);
 		pageBean.setTotalCount(totalCount);

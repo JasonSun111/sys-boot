@@ -12,17 +12,17 @@ import com.sunys.core.context.ContextProvider;
 import com.sunys.core.dao.BaseDao;
 import com.sunys.core.service.BaseService;
 import com.sunys.core.util.PageUtils;
-import com.sunys.facade.bean.AbstractBean;
 import com.sunys.facade.bean.DapContext;
 import com.sunys.facade.bean.PageBean;
 import com.sunys.facade.bean.PageParam;
+import com.sunys.facade.bean.base.BaseDo;
 
 /**
  * BaseServiceImpl
  * @author sunys
  * @date 2019年1月4日
  */
-public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseService<T> {
+public abstract class BaseServiceImpl<Do extends BaseDo> implements BaseService<Do> {
 
 	@Autowired
 	private ContextProvider contextProvider;
@@ -31,7 +31,7 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	 * 获取要操作的Dao
 	 * @return
 	 */
-	public abstract BaseDao<T> getDao();
+	protected abstract BaseDao<Do> getDao();
 
 	/**
 	 * 获取当前用户的用户名
@@ -44,26 +44,26 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public T getById(Long pkid) throws Exception {
-		T t = getDao().getById(pkid);
+	public Do getById(Long pkid) throws Exception {
+		Do t = getDao().getById(pkid);
 		return t;
 	}
 
 	@Override
-	public PageBean<T> listPage(Map<String, Object> params,PageParam pageParam) throws Exception {
+	public PageBean<Do> listPage(Map<String, Object> params,PageParam pageParam) throws Exception {
 		if(params==null){
 			params = new HashMap<>();
 		}
 		params.put("pageParam", pageParam);
-		List<T> list = getDao().pageList(params);
+		List<Do> list = getDao().pageList(params);
 		int totalCount = getDao().pageCount(params);
-		PageBean<T> pageBean = PageUtils.getPageBean(list, totalCount, pageParam);
+		PageBean<Do> pageBean = PageUtils.getPageBean(list, totalCount, pageParam);
 		return pageBean;
 	}
 
 	@Override
-	public T getOne(Map<String, Object> params) throws Exception {
-		List<T> list = getDao().listBy(params);
+	public Do getOne(Map<String, Object> params) throws Exception {
+		List<Do> list = getDao().listBy(params);
 		if(list.size() > 0){
 			return list.get(0);
 		}
@@ -71,13 +71,13 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public List<T> listBy(Map<String, Object> params) throws Exception {
-		List<T> list = getDao().listBy(params);
+	public List<Do> listBy(Map<String, Object> params) throws Exception {
+		List<Do> list = getDao().listBy(params);
 		return list;
 	}
 
 	@Override
-	public int insert(T entity) throws Exception {
+	public int insert(Do entity) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		entity.setCreateBy(username);
@@ -87,10 +87,10 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int insertAll(List<T> list) throws Exception {
+	public int insertAll(List<Do> list) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
-		for (T entity : list) {
+		for (Do entity : list) {
 			entity.setCreateBy(username);
 			entity.setCreateOn(date);
 		}
@@ -99,12 +99,12 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int[] insertList(List<T> list) throws Exception {
+	public int[] insertList(List<Do> list) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		int[] arr = new int[list.size()];
 		for(int i=0; i<list.size(); i++){
-			T entity = list.get(i);
+			Do entity = list.get(i);
 			entity.setCreateBy(username);
 			entity.setCreateOn(date);
 			arr[i] = getDao().insert(entity);
@@ -113,7 +113,7 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int update(T entity) throws Exception {
+	public int update(Do entity) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		entity.setUpdateBy(username);
@@ -123,12 +123,12 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int[] updateList(List<T> list) throws Exception {
+	public int[] updateList(List<Do> list) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		int[] arr = new int[list.size()];
 		for(int i=0; i<list.size(); i++){
-			T entity = list.get(i);
+			Do entity = list.get(i);
 			entity.setUpdateBy(username);
 			entity.setUpdateOn(date);
 			arr[i] = getDao().update(entity);
@@ -137,7 +137,7 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int updateIf(T entity) throws Exception {
+	public int updateIf(Do entity) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		entity.setUpdateBy(username);
@@ -147,12 +147,12 @@ public abstract class BaseServiceImpl<T extends AbstractBean> implements BaseSer
 	}
 
 	@Override
-	public int[] updateIfList(List<T> list) throws Exception {
+	public int[] updateIfList(List<Do> list) throws Exception {
 		String username = currentUsername();
 		Date date = new Date();
 		int[] arr = new int[list.size()];
 		for(int i=0; i<list.size(); i++){
-			T entity = list.get(i);
+			Do entity = list.get(i);
 			entity.setUpdateBy(username);
 			entity.setUpdateOn(date);
 			arr[i] = getDao().updateIf(entity);

@@ -12,13 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.sunys.core.test.aop.LogAspectTest;
-import com.sunys.core.test.bean.Dut;
-import com.sunys.core.test.bean.Step;
-import com.sunys.core.test.bean.Testcase;
 import com.sunys.core.test.conf.TestsConfiguration;
-import com.sunys.core.test.run.DutGroupRun;
-import com.sunys.facade.run.RootGroupRun;
-import com.sunys.facade.run.RunFactory;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes={TestsConfiguration.class})
@@ -49,19 +43,5 @@ public class SpringTests {
 		String str = logAspectTest.test("ddd");
 		logger.info(str);
 	}
-	
-	@Test
-	public void runTest() throws Exception {
-		Testcase testcase = new Testcase();
-		for (int i = 0; i < 4; i++) {
-			Dut dut = new Dut();
-			for (int j = 0; j < 4; j++) {
-				Step step = new Step();
-				dut.getSteps().add(step);
-			}
-			testcase.getDuts().add(dut);
-		}
-		RootGroupRun<DutGroupRun> testcaseRun = RunFactory.getRun(testcase);
-		testcaseRun.run();
-	}
+
 }

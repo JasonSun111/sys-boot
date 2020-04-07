@@ -14,8 +14,8 @@ import com.sunys.facade.exception.ExceptionInfo;
  */
 public class ResultBean<T> {
 
-	public static final byte SUCCESS_STATUS = 1;
-	public static final byte ERROR_STATUS = 0;
+	public static final byte SUCCESS_STATUS = 0;
+	public static final byte ERROR_STATUS = 1;
 
 	private T result;
 	private Date time;

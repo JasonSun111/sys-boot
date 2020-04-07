@@ -1,31 +1,31 @@
 package com.sunys.facade.bean;
 
 /**
- * 前端处理的消息
+ * websocket消息
  * SocketMessage
  * @author sunys
  * @date 2019年3月5日
  */
-public class SocketMessage {
+public class SocketMessage<T> {
 
-	//前端回调函数的名称
-	private String funcName;
+	//消息标题
+	private String title;
 	//服务端返回的数据
-	private Object data;
+	private T data;
 
-	public String getFuncName() {
-		return funcName;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setFuncName(String funcName) {
-		this.funcName = funcName;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public Object getData() {
+	public T getData() {
 		return data;
 	}
 
-	public void setData(Object data) {
+	public void setData(T data) {
 		this.data = data;
 	}
 }

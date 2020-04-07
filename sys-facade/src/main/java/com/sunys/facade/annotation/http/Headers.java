@@ -1,17 +1,13 @@
-package com.sunys.facade.annotation;
+package com.sunys.facade.annotation.http;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.sunys.facade.http.HttpMethod;
-
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Request {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface Headers {
 
-	String url();
-	
-	HttpMethod method() default HttpMethod.GET;
+	Header[] value() default {};
 }

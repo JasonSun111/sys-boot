@@ -11,16 +11,6 @@ import java.util.function.Predicate;
  */
 public interface GroupRun<T extends Run> extends Run {
 
-	byte RUNTYPE_SERIAL = 1;
-	byte RUNTYPE_PARALLEL = 2;
-	byte RUNTYPE_EVENT = 3;
-	
-	/**
-	 * 运行类型
-	 * @return
-	 */
-	byte getRunType();
-	
 	/**
 	 * 组里面包含的run对象
 	 * @return
@@ -67,21 +57,5 @@ public interface GroupRun<T extends Run> extends Run {
 			}
 		}
 	}
-	
-	/**
-	 * RunType是event时，运行组中的一个run接口
-	 * @param eventIndex
-	 */
-	void eventRun(int eventIndex);
-	
-	/**
-	 * RunType是event时，设置状态，结束运行
-	 */
-	void setEventRunStatus();
-	
-	/**
-	 * RunType是event时，设置状态，结束运行
-	 * @param status
-	 */
-	void setEventRunStatus(Byte status);
+
 }

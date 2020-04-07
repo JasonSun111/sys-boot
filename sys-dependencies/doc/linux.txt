@@ -309,6 +309,16 @@ docker run --detach \
 
 docker run --detach \
 	--hostname gitlab.qnmlgb.com \
+	--env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.qnmlgb.com/'; gitlab_rails['lfs_enabled'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2333" \
+	--publish 443:443 --publish 80:80 --publish 2333:22 \
+	--name gitlab \
+	--volume /home/123/docker/usr/etc/gitlab:/usr/etc/gitlab \
+	--volume /home/123/docker/usr/var/log/gitlab:/usr/var/log/gitlab \
+	--volume /home/123/docker/usr/var/opt/gitlab:/usr/var/opt/gitlab \
+	gitlab/gitlab-ce:latest
+
+docker run --detach \
+	--hostname gitlab.qnmlgb.com \
 	--publish 80:80 --publish 2333:22 \
 	--name gitlab \
 	--restart always \
@@ -316,6 +326,20 @@ docker run --detach \
 	--volume /srv/gitlab/logs:/var/log/gitlab \
 	--volume /srv/gitlab/data:/var/opt/gitlab \
 	gitlab/gitlab-ce:11.8.1-ce.0
+
+
+docker安装jenkins
+
+docker pull jenkinsci/blueocean
+docker run -u root \
+	-d
+	--name jenkins01 \
+	-p 8080:8080 \
+	-p 50000:50000 \
+	-v /var/jenkins_home:/var/jenkins_home \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	jenkinsci/blueocean:latest
+
 
 docker安装mysql
 
@@ -442,6 +466,11 @@ cp -r usr/* /usr/
 yum install libXScrnSaver*
 yum install libappindicator-gtk3
 
+
+安装steam
+yum install libtxc_dxtn
+yum-config-manager --add-repo=http://negativo17.org/repos/epel-steam.repo
+yum install steam
 
 
 
