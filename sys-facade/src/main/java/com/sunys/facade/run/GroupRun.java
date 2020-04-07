@@ -23,17 +23,16 @@ public interface GroupRun<T extends Run> extends Run {
 	 * @param list
 	 */
 	default void recursion(Class<? extends Run> clazz, List<Run> list) {
-		recursion(clazz, null, list);
+		recursion(run -> clazz.isInstance(run), list);
 	}
 	
 	/**
-	 * 递归整个组，是clazz的子类且符合条件的，添加到list中
-	 * @param clazz
+	 * 递归整个组，将符合条件的添加到list中
 	 * @param predicate
 	 * @param list
 	 */
-	default void recursion(Class<? extends Run> clazz, Predicate<Run> predicate, List<Run> list) {
-		recursion(clazz, run -> {
+	default void recursion(Predicate<Run> predicate, List<Run> list) {
+		recursion(run -> {
 			if (predicate.test(run)) {
 				list.add(run);
 			}
@@ -41,19 +40,16 @@ public interface GroupRun<T extends Run> extends Run {
 	}
 	
 	/**
-	 * 递归整个组，是clazz子类的，调用consumer接口
-	 * @param clazz
+	 * 递归整个组，调用consumer接口
 	 * @param consumer
 	 */
-	default void recursion(Class<? extends Run> clazz, Consumer<Run> consumer) {
+	default void recursion(Consumer<Run> consumer) {
 		List<T> runs = getRuns();
 		for (T run : runs) {
-			if (clazz.isInstance(run)) {
-				consumer.accept(run);
-			}
+			consumer.accept(run);
 			if (run instanceof GroupRun) {
 				GroupRun<? extends Run> groupRun = (GroupRun) run;
-				groupRun.recursion(clazz, consumer);
+				groupRun.recursion(consumer);
 			}
 		}
 	}

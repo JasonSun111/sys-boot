@@ -25,24 +25,10 @@ public interface Run {
 	 */
 	void setProxy(Run proxy);
 	
-	/**
-	 * 获取多层上级节点
-	 * @param <T>
-	 * @param clazz
-	 * @return
-	 */
-	<T> T parents(Class<? extends Run> clazz);
+	void registEventHandler(int type, EventHandler<?> eventHandler);
 	
-	/**
-	 * 获取上级节点
-	 * @return
-	 */
-	GroupRun<? extends Run> getParent();
+	void unregistEventHandler(int type);
 	
-	/**
-	 * 获取根节点
-	 * @return
-	 */
-	RootGroupRun<? extends Run> getRoot();
+	<P, R> R event(Event<P> event);
 
 }

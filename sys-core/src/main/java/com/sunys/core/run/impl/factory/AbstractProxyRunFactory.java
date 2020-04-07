@@ -9,11 +9,11 @@ import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunFactory;
 
 /**
- * AbstractRunFactory
+ * AbstractProxyRunFactory
  * @author sunys
  * @date Dec 21, 2019
  */
-public abstract class AbstractRunFactory<T extends Run, P> implements RunFactory<T, P> {
+public abstract class AbstractProxyRunFactory<T extends Run, P> implements RunFactory<T, P> {
 
 	/**
 	 * 创建原始的run实现类对象
