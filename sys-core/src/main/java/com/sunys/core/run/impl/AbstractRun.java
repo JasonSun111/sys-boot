@@ -1,9 +1,12 @@
 package com.sunys.core.run.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
+import com.sunys.facade.run.Event;
+import com.sunys.facade.run.EventHandler;
 import com.sunys.facade.run.GroupRun;
-import com.sunys.facade.run.RootGroupRun;
 import com.sunys.facade.run.Run;
 
 /**
@@ -15,13 +18,13 @@ public abstract class AbstractRun implements Run {
 
 	private static final LongAdder longAdder = new LongAdder();
 	
+	private Map<Integer, EventHandler<?>> eventHandlerMap = new HashMap<>();
+	
 	private Run proxy;
 	
 	protected long id;
 	
 	protected GroupRun<? extends Run> parent;
-	
-	protected RootGroupRun<? extends Run> root;
 	
 	public AbstractRun() {
 		synchronized (AbstractRun.class) {
@@ -41,18 +44,6 @@ public abstract class AbstractRun implements Run {
 	}
 
 	@Override
-	public <T> T parents(Class<? extends Run> clazz) {
-		if (parent != null) {
-			if (clazz.isInstance(parent)) {
-				return (T) parent;
-			}
-			T t = parent.parents(clazz);
-			return t;
-		}
-		return null;
-	}
-
-	@Override
 	public long getId() {
 		return id;
 	}
@@ -61,13 +52,26 @@ public abstract class AbstractRun implements Run {
 		this.id = id;
 	}
 
-	@Override
-	public GroupRun<? extends Run> getParent() {
-		return parent;
-	}
-
 	public void setParent(GroupRun<? extends Run> parent) {
 		this.parent = parent;
+	}
+
+	@Override
+	public void registEventHandler(int type, EventHandler<?> eventHandler) {
+		eventHandlerMap.put(type, eventHandler);
+	}
+
+	@Override
+	public void unregistEventHandler(int type) {
+		eventHandlerMap.remove(type);
+	}
+
+	@Override
+	public <P, R> R event(Event<P> event) {
+		int type = event.type();
+		EventHandler<P> eventHandler = (EventHandler<P>) eventHandlerMap.get(type);
+		Object result = eventHandler.handle(event);
+		return (R) result;
 	}
 
 }
