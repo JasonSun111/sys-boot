@@ -81,8 +81,11 @@ git reset --hard HEAD^
 9、回到上几次提交的版本
 git reset --hard HEAD~3
 
-10、根据commit id回到指定版本
+10、根据commit id回到指定版本，不生成新的commit
 git reset --hard commitid
+
+git push -f -u origin dev
+回滚后强制推送dev分支
 
 git reset --soft commitid
 只移动本地库的head指针，会出现没有commit的文件
@@ -134,6 +137,10 @@ git push origin --delete dev
 
 25、删除远程仓库为1.2的tag
 git push origin --delete tag 1.2
+
+
+回滚代码，生成新的commit
+git revert -n commitid
 
 
 
