@@ -11,6 +11,23 @@ public class SortTests {
 	private static int replaceCount = 0;
 	
 	@Test
+	public void quickSort() {
+		int[] arr = {1,2,3,4,5,6};
+		partition(arr, 0, arr.length - 1);
+	}
+	
+	private void partition(int[] arr, int start, int end) {
+		if (start >= end) {
+			return;
+		}
+		int p = end;
+		for (int left = start, right = end - 1; left < right;) {
+			
+		}
+		
+	}
+	
+	@Test
 	public void margeSort() {
 		int[] arr = {1,2,3,4,5,6};
 		margeSort(arr, 0, arr.length);
@@ -21,7 +38,7 @@ public class SortTests {
 		if (len <= 1) {
 			return;
 		}
-		int arr1Len = len / 2;
+		int arr1Len = len >> 1;
 		int arr2Len = len - arr1Len;
 		int start2 = start + arr1Len;
 		margeSort(arr, start, arr1Len);

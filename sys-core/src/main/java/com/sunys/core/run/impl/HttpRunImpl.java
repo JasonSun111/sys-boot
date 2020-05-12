@@ -10,9 +10,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.sunys.facade.run.Event;
-import com.sunys.facade.run.EventHandler;
-import com.sunys.facade.run.Run;
 import com.sunys.facade.run.http.HttpEntity;
 import com.sunys.facade.run.http.HttpHeaders;
 import com.sunys.facade.run.http.HttpMethod;
@@ -51,36 +48,6 @@ public class HttpRunImpl implements HttpRun {
 	public long getId() {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public Run getProxy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setProxy(Run proxy) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void registEventHandler(int type, EventHandler<?> eventHandler) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregistEventHandler(int type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public <P, R> R event(Event<P> event) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

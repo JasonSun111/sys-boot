@@ -15,7 +15,7 @@ public interface GroupRun<T extends Run> extends Run {
 	 * 组里面包含的run对象
 	 * @return
 	 */
-	List<T> getRuns();
+	Iterable<T> getRuns();
 	
 	/**
 	 * 递归整个组，是clazz的子类，添加到list中
@@ -44,7 +44,7 @@ public interface GroupRun<T extends Run> extends Run {
 	 * @param consumer
 	 */
 	default void recursion(Consumer<Run> consumer) {
-		List<T> runs = getRuns();
+		Iterable<T> runs = getRuns();
 		for (T run : runs) {
 			consumer.accept(run);
 			if (run instanceof GroupRun) {
