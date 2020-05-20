@@ -17,7 +17,7 @@ public enum ShellStateType implements StateType {
 	//#
 	//$
 	//>
-	BIN_BASH(Pattern.compile(" ?[>\\\\$#] ?$")),
+	BIN_BASH(Pattern.compile(" ?[>\\$#] ?$")),
 	
 	//login:
 	INPUT_USERNAME(Pattern.compile("(?i)login: ?$")),
@@ -26,7 +26,7 @@ public enum ShellStateType implements StateType {
 	INPUT_PASSWORD(Pattern.compile("(?i)password: ?$")),
 	
 	//continue connecting (yes/no)?
-	CONFIRM_KEY(Pattern.compile("(?i)continue connecting ?\\\\(yes/no\\\\)\\\\? ?$")),
+	CONFIRM_KEY(Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$")),
 	;
 	
 	static {
