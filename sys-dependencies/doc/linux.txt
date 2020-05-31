@@ -334,12 +334,11 @@ docker pull jenkinsci/blueocean
 docker run -u root \
 	-d
 	--name jenkins01 \
-	-p 8080:8080 \
+	-p 8081:8080 \
 	-p 50000:50000 \
-	-v /var/jenkins_home:/var/jenkins_home \
+	-v $HOME/docker/jenkins:/var/jenkins_home
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	jenkinsci/blueocean:latest
-
 
 docker安装mysql
 
