@@ -2,20 +2,25 @@ package com.sunys.core.run.impl;
 
 import com.sunys.facade.run.ContextState;
 import com.sunys.facade.run.State;
+import com.sunys.facade.run.StateEvent;
 
-public class ContextStateImpl implements ContextState {
+public class ContextStateImpl<T extends State> implements ContextState<T> {
 
-	private State state;
+	private T state;
 	
+	public ContextStateImpl(T state) {
+		this.state = state;
+	}
+
 	@Override
-	public State currentState() {
+	public T currentState() {
 		return state;
 	}
 
 	@Override
-	public void change(State state) {
-		// TODO Auto-generated method stub
-		
+	public <P> void change(StateEvent<P, T> event) {
+		state.handle(event);
+		this.state = event.getState();
 	}
 
 }

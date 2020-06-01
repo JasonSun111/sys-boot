@@ -12,22 +12,22 @@ import com.sunys.facade.run.StateType;
  * @author sunys
  * @date May 17, 2020
  */
-public enum ShellStateType implements StateType {
+public class ShellStateType implements StateType {
 
 	//#
 	//$
 	//>
-	BIN_BASH(Pattern.compile(" ?[>\\$#] ?$")),
+	public static final ShellStateType BIN_BASH = new ShellStateType(Pattern.compile(" ?[>\\$#] ?$"));
 	
 	//login:
-	INPUT_USERNAME(Pattern.compile("(?i)login: ?$")),
+	public static final ShellStateType INPUT_USERNAME = new ShellStateType(Pattern.compile("(?i)login: ?$"));
 	
 	//password:
-	INPUT_PASSWORD(Pattern.compile("(?i)password: ?$")),
+	public static final ShellStateType INPUT_PASSWORD = new ShellStateType(Pattern.compile("(?i)password: ?$"));
 	
 	//continue connecting (yes/no)?
-	CONFIRM_KEY(Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$")),
-	;
+	public static final ShellStateType CONFIRM_KEY = new ShellStateType(Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$"));
+	
 	
 	static {
 		BIN_BASH.set.add(CONFIRM_KEY);
@@ -50,7 +50,7 @@ public enum ShellStateType implements StateType {
 
 	private Pattern pattern;
 
-	private ShellStateType(Pattern pattern) {
+	public ShellStateType(Pattern pattern) {
 		this.pattern = pattern;
 	}
 

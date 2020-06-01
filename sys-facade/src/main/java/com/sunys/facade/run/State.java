@@ -18,5 +18,5 @@ public interface State {
 	 * 改变状态时的处理
 	 * @param state
 	 */
-	void handle(Event<?> event);
+	<P> void handle(StateEvent<P, ? extends State> event);
 }

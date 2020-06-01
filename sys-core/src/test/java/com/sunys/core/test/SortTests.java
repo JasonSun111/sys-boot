@@ -11,6 +11,16 @@ public class SortTests {
 	private static int replaceCount = 0;
 	
 	@Test
+	public void aaa() {
+		String s = "ddd\nfffff\nssss\n";
+		System.out.println("(" + s + ")");
+		System.out.println();
+		System.out.println("(" + s.substring(0, s.lastIndexOf("\n")) + ")");
+		System.out.println();
+		System.out.println("(" + s.substring(s.lastIndexOf("\n")) + ")");
+	}
+	
+	@Test
 	public void quickSort() {
 		int[] arr = {1,2,3,4,5,6};
 		partition(arr, 0, arr.length - 1);

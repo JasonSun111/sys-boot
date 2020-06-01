@@ -6,17 +6,17 @@ package com.sunys.facade.run;
  * @author sunys
  * @date May 17, 2020
  */
-public interface ContextState {
+public interface ContextState<T extends State> {
 
 	/**
 	 * 当前状态
 	 * @return
 	 */
-	State currentState();
+	T currentState();
 	
 	/**
 	 * 改变状态
 	 * @param state
 	 */
-	void change(State state);
+	<P> void change(StateEvent<P, T> event);
 }
