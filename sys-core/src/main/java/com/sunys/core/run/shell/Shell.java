@@ -84,7 +84,7 @@ public class Shell {
 					int len = 0;
 					if ((len = br.read(cb)) != -1) {
 						canCallback = true;
-						buf.append(new String(cb, 0, len));
+						buf.append(cb, 0, len);
 						int lastIndexOf = buf.lastIndexOf("\n");
 						String s1 = buf.substring(0, lastIndexOf);
 						String s2 = buf.substring(lastIndexOf + 1);
@@ -104,7 +104,11 @@ public class Shell {
 					State currentState = contextState.currentState();
 					if (!canCallback) {
 						synchronized (this) {
-							this.wait(1000);
+							if (!process.isAlive()) {
+								notifyAll();
+								break;
+							}
+							wait(1000);
 						}
 					} else {
 						Set<ShellStateType> set = currentState.type().nexts();

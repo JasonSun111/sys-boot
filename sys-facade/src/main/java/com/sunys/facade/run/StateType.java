@@ -11,6 +11,12 @@ import java.util.Set;
 public interface StateType {
 
 	/**
+	 * 获取名称
+	 * @return
+	 */
+	String getName();
+	
+	/**
 	 * 获取可以改变成什么状态类型
 	 * @return
 	 */
