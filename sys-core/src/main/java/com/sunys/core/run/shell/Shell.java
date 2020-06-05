@@ -102,15 +102,7 @@ public class Shell {
 					}
 				} else {
 					State currentState = contextState.currentState();
-					if (!canCallback) {
-						synchronized (this) {
-							if (!process.isAlive()) {
-								notifyAll();
-								break;
-							}
-							wait(1000);
-						}
-					} else {
+					if (canCallback) {
 						Set<ShellStateType> set = currentState.type().nexts();
 						for (ShellStateType type : set) {
 							if (type.match(buf.toString())) {
@@ -120,6 +112,14 @@ public class Shell {
 							}
 						}
 						canCallback = false;
+					} else {
+						synchronized (this) {
+							if (!process.isAlive()) {
+								notifyAll();
+								break;
+							}
+							wait(1000);
+						}
 					}
 				}
 			}

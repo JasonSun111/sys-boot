@@ -11,7 +11,7 @@ public class ContextStateImpl<T extends State> implements ContextState<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(ContextStateImpl.class);
 	
-	private T state;
+	private volatile T state;
 	
 	public ContextStateImpl(T state) {
 		this.state = state;
