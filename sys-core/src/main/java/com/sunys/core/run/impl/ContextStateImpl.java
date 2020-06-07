@@ -6,8 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.sunys.facade.run.ContextState;
 import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateEvent;
+import com.sunys.facade.run.StateType;
 
-public class ContextStateImpl<T extends State> implements ContextState<T> {
+public class ContextStateImpl<T extends State<? extends StateType>> implements ContextState<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(ContextStateImpl.class);
 	

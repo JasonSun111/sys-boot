@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sunys.facade.run.Event;
 import com.sunys.facade.run.EventHandler;
 import com.sunys.facade.run.EventType;
@@ -18,6 +21,8 @@ import com.sunys.facade.run.Subject;
  */
 public class SubjectImpl implements Subject {
 
+	private static final Logger log = LoggerFactory.getLogger(SubjectImpl.class);
+	
 	private Map<EventType, Set<EventHandler<?>>> eventHandlerMap = new HashMap<>();
 	
 	@Override
@@ -48,6 +53,7 @@ public class SubjectImpl implements Subject {
 	@Override
 	public <P> void event(Event<P> event) {
 		EventType type = event.type();
+		log.info("Event process..., type:{}", type);
 		Set<EventHandler<?>> set = eventHandlerMap.get(type);
 		for (Iterator<EventHandler<?>> it = set.iterator(); it.hasNext();) {
 			EventHandler<P> eventHandler = (EventHandler<P>) it.next();

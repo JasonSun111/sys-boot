@@ -2,8 +2,9 @@ package com.sunys.core.run.impl;
 
 import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateEvent;
+import com.sunys.facade.run.StateType;
 
-public class StateEventImpl<P, T extends State> implements StateEvent<P, T> {
+public class StateEventImpl<P, T extends State<? extends StateType>> implements StateEvent<P, T> {
 
 	private P param;
 	

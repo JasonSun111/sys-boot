@@ -20,5 +20,7 @@ public interface StateType {
 	 * 获取可以改变成什么状态类型
 	 * @return
 	 */
-	<T extends StateType> Set<T> nexts();
+	Set<? extends StateType> nexts();
+	
+	State<? extends StateType> getState(StateType type);
 }

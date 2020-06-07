@@ -6,17 +6,17 @@ package com.sunys.facade.run;
  * @author sunys
  * @date May 17, 2020
  */
-public interface State {
+public interface State<T extends StateType> {
 
 	/**
 	 * 状态类型
 	 * @return
 	 */
-	StateType type();
+	T type();
 	
 	/**
 	 * 改变状态时的处理
 	 * @param state
 	 */
-	<P> void handle(StateEvent<P, ? extends State> event);
+	<P> void handle(StateEvent<P, ? extends State<? extends StateType>> event);
 }

@@ -1,9 +1,11 @@
 package com.sunys.core.run.shell;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateType;
 
 /**
@@ -38,6 +40,7 @@ public class ShellStateType implements StateType {
 	
 	
 	static {
+		/*
 		BIN_BASH.set.add(CONFIRM_KEY);
 		BIN_BASH.set.add(INPUT_USERNAME);
 		BIN_BASH.set.add(INPUT_PASSWORD);
@@ -52,10 +55,11 @@ public class ShellStateType implements StateType {
 		INPUT_PASSWORD.set.add(INPUT_USERNAME);
 		INPUT_PASSWORD.set.add(INPUT_PASSWORD);
 		INPUT_PASSWORD.set.add(BIN_BASH);
+		*/
 	}
 
-	private Set<ShellStateType> set = new HashSet<>();
-
+	private Map<ShellStateType, State<ShellStateType>> typeStateMap = new HashMap<>();
+	
 	private String name;
 	
 	private Pattern pattern;
@@ -71,8 +75,17 @@ public class ShellStateType implements StateType {
 	}
 	
 	@Override
-	public <T extends StateType> Set<T> nexts() {
-		return (Set<T>) set;
+	public Set<ShellStateType> nexts() {
+		return typeStateMap.keySet();
+	}
+	
+	@Override
+	public State<ShellStateType> getState(StateType shellStateType) {
+		return typeStateMap.get(shellStateType);
+	}
+	
+	public void addHandler(ShellStateType shellStateType, State<ShellStateType> state) {
+		typeStateMap.put(shellStateType, state);
 	}
 	
 	public boolean match(String str) {
