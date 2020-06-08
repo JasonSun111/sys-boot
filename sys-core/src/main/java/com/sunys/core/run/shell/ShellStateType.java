@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateType;
 
 /**
@@ -23,24 +22,34 @@ public class ShellStateType implements StateType {
 	public static final String INPUT_PASSWORD_NAME = "INPUT_PASSWORD";
 	
 	public static final String CONFIRM_KEY_NAME = "CONFIRM_KEY";
-	
+
 	//#
 	//$
 	//>
-	public static final ShellStateType BIN_BASH = new ShellStateType(BIN_BASH_NAME, Pattern.compile(" ?[>\\$#] ?$"));
+	public static final Pattern BIN_BASH_PATTERN = Pattern.compile(" ?[>\\$#] ?$");
 	
 	//login:
-	public static final ShellStateType INPUT_USERNAME = new ShellStateType(INPUT_USERNAME_NAME, Pattern.compile("(?i)login: ?$"));
+	public static final Pattern INPUT_USERNAME_PATTERN = Pattern.compile("(?i)login: ?$");
 	
 	//password:
-	public static final ShellStateType INPUT_PASSWORD = new ShellStateType(INPUT_PASSWORD_NAME, Pattern.compile("(?i)password: ?$"));
+	public static final Pattern INPUT_PASSWORD_PATTERN = Pattern.compile("(?i)password: ?$");
 	
 	//continue connecting (yes/no)?
-	public static final ShellStateType CONFIRM_KEY = new ShellStateType(CONFIRM_KEY_NAME, Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$"));
+	public static final Pattern CONFIRM_KEY_PATTERN = Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$");
+	
+	
+	public static final ShellStateType BIN_BASH = new ShellStateType(BIN_BASH_NAME, BIN_BASH_PATTERN);
+	
+	public static final ShellStateType INPUT_USERNAME = new ShellStateType(INPUT_USERNAME_NAME, INPUT_USERNAME_PATTERN);
+	
+	public static final ShellStateType INPUT_PASSWORD = new ShellStateType(INPUT_PASSWORD_NAME, INPUT_PASSWORD_PATTERN);
+	
+	public static final ShellStateType CONFIRM_KEY = new ShellStateType(CONFIRM_KEY_NAME, CONFIRM_KEY_PATTERN);
 	
 	
 	static {
 		/*
+		Evolution
 		BIN_BASH.set.add(CONFIRM_KEY);
 		BIN_BASH.set.add(INPUT_USERNAME);
 		BIN_BASH.set.add(INPUT_PASSWORD);
@@ -58,7 +67,7 @@ public class ShellStateType implements StateType {
 		*/
 	}
 
-	private Map<ShellStateType, State<ShellStateType>> typeStateMap = new HashMap<>();
+	private Map<ShellStateType, ShellState> typeStateMap = new HashMap<>();
 	
 	private String name;
 	
@@ -80,11 +89,11 @@ public class ShellStateType implements StateType {
 	}
 	
 	@Override
-	public State<ShellStateType> getState(StateType shellStateType) {
+	public ShellState getState(StateType shellStateType) {
 		return typeStateMap.get(shellStateType);
 	}
 	
-	public void addHandler(ShellStateType shellStateType, State<ShellStateType> state) {
+	public void addState(ShellStateType shellStateType, ShellState state) {
 		typeStateMap.put(shellStateType, state);
 	}
 	

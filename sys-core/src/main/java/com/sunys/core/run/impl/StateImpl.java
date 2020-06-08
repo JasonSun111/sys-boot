@@ -23,7 +23,9 @@ public class StateImpl<T extends StateType> implements State<T> {
 
 	@Override
 	public <P> void handle(StateEvent<P, ? extends State<? extends StateType>> event) {
-		subject.event(event);
+		if (subject != null) {
+			subject.event(event);
+		}
 	}
 
 }

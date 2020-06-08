@@ -3,21 +3,42 @@ package com.sunys.core.test;
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sunys.core.run.impl.StateEventType;
+import com.sunys.core.run.impl.SubjectImpl;
+import com.sunys.core.run.shell.ShellState;
+import com.sunys.core.run.shell.ShellStateType;
+import com.sunys.facade.run.Subject;
 
 public class SortTests {
 
+	private static final Logger log = LoggerFactory.getLogger(SortTests.class);
+	
 	private static int compareCount = 0;
 	
 	private static int replaceCount = 0;
 	
 	@Test
+	public void shell() {
+		ShellStateType bashStateType = new ShellStateType(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
+		Subject bashSubject = new SubjectImpl();
+		bashSubject.registEventHandler(new StateEventType(bashStateType.getName()), null);
+		ShellState bashState = new ShellState(bashSubject, bashStateType);
+		
+		bashStateType.addState(bashStateType, bashState);
+	}
+	
+	@Test
 	public void aaa() {
 		String s = "ddd\nfffff\nssss\n";
-		System.out.println("(" + s + ")");
-		System.out.println();
-		System.out.println("(" + s.substring(0, s.lastIndexOf("\n")) + ")");
-		System.out.println();
-		System.out.println("(" + s.substring(s.lastIndexOf("\n")) + ")");
+		log.info("s.split:{}", (Object) s.split("\n"));
+		log.info("(" + s + ")");
+		log.info("");
+		log.info("(" + s.substring(0, s.lastIndexOf("\n")) + ")");
+		log.info("");
+		log.info("(" + s.substring(s.lastIndexOf("\n")) + ")");
 	}
 	
 	@Test
