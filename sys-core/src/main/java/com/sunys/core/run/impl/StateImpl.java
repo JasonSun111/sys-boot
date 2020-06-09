@@ -1,5 +1,7 @@
 package com.sunys.core.run.impl;
 
+import com.sunys.facade.run.EventHandler;
+import com.sunys.facade.run.EventType;
 import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateEvent;
 import com.sunys.facade.run.StateType;
@@ -19,6 +21,21 @@ public class StateImpl<T extends StateType> implements State<T> {
 	@Override
 	public T type() {
 		return type;
+	}
+
+	@Override
+	public void registEventHandler(EventType type, EventHandler<?> eventHandler) {
+		subject.registEventHandler(type, eventHandler);
+	}
+
+	@Override
+	public void removeEventHandler(EventType type) {
+		subject.removeEventHandler(type);
+	}
+
+	@Override
+	public void removeEventHandler(EventHandler<?> eventHandler) {
+		subject.removeEventHandler(eventHandler);
 	}
 
 	@Override

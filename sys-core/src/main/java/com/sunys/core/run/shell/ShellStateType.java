@@ -21,6 +21,8 @@ public class ShellStateType implements StateType {
 	
 	public static final String INPUT_PASSWORD_NAME = "INPUT_PASSWORD";
 	
+	public static final String LOGIN_FAIL_NAME = "LOGIN_FAIL";
+	
 	public static final String CONFIRM_KEY_NAME = "CONFIRM_KEY";
 
 	//#
@@ -34,39 +36,13 @@ public class ShellStateType implements StateType {
 	//password:
 	public static final Pattern INPUT_PASSWORD_PATTERN = Pattern.compile("(?i)password: ?$");
 	
+	//login incorrect
+	public static final Pattern LOGIN_FAIL_PATTERN = Pattern.compile("(?i)login incorrect\\n?");
+	
 	//continue connecting (yes/no)?
 	public static final Pattern CONFIRM_KEY_PATTERN = Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$");
 	
 	
-	public static final ShellStateType BIN_BASH = new ShellStateType(BIN_BASH_NAME, BIN_BASH_PATTERN);
-	
-	public static final ShellStateType INPUT_USERNAME = new ShellStateType(INPUT_USERNAME_NAME, INPUT_USERNAME_PATTERN);
-	
-	public static final ShellStateType INPUT_PASSWORD = new ShellStateType(INPUT_PASSWORD_NAME, INPUT_PASSWORD_PATTERN);
-	
-	public static final ShellStateType CONFIRM_KEY = new ShellStateType(CONFIRM_KEY_NAME, CONFIRM_KEY_PATTERN);
-	
-	
-	static {
-		/*
-		Evolution
-		BIN_BASH.set.add(CONFIRM_KEY);
-		BIN_BASH.set.add(INPUT_USERNAME);
-		BIN_BASH.set.add(INPUT_PASSWORD);
-		BIN_BASH.set.add(BIN_BASH);
-		
-		CONFIRM_KEY.set.add(INPUT_PASSWORD);
-		CONFIRM_KEY.set.add(BIN_BASH);
-		
-		INPUT_USERNAME.set.add(INPUT_PASSWORD);
-		INPUT_USERNAME.set.add(BIN_BASH);
-		
-		INPUT_PASSWORD.set.add(INPUT_USERNAME);
-		INPUT_PASSWORD.set.add(INPUT_PASSWORD);
-		INPUT_PASSWORD.set.add(BIN_BASH);
-		*/
-	}
-
 	private Map<ShellStateType, ShellState> typeStateMap = new HashMap<>();
 	
 	private String name;
