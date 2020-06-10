@@ -41,4 +41,9 @@ public class StateEventType implements EventType {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "StateEventType [name=" + name + "]";
+	}
 }

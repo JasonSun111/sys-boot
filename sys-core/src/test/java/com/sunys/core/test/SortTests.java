@@ -24,24 +24,54 @@ public class SortTests {
 	
 	@Test
 	public void telnet() throws Exception {
-		Shell shell = Shell.builder().cmdStart("telnet 192.168.1.191").state()
+		Shell shell = Shell.builder().cmdStart("telnet localhost").state()
 			//登录成功
 			.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
-			.addHandler(ShellStateType.BIN_BASH_NAME, null)
+			.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> {
+				try {
+					sh.sendCommand("ls -l", "exit");
+				} catch (Exception e) {
+					
+				}
+			})
 			//输入用户名
 			.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
-			.addHandler(ShellStateType.INPUT_USERNAME_NAME, null)
+			.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> {
+				try {
+					sh.sendCommand("123");
+				} catch (Exception e) {
+					
+				}
+			})
 				.next(ShellStateType.INPUT_USERNAME_NAME)
 				//输入密码
 				.add(ShellStateType.INPUT_PASSWORD_NAME, ShellStateType.INPUT_PASSWORD_PATTERN)
-				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, null)
+				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> {
+					try {
+						sh.sendCommand("123");
+					} catch (Exception e) {
+						
+					}
+				})
 					.next(ShellStateType.INPUT_PASSWORD_NAME)
 					//密码错误，退出
 					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, null)
+					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> {
+						try {
+							sh.stop();
+						} catch (Exception e) {
+							
+						}
+					})
 					//登录成功
 					.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
-					.addHandler(ShellStateType.BIN_BASH_NAME, null)
+					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> {
+						try {
+							sh.sendCommand("ls -l", "exit");
+						} catch (Exception e) {
+							
+						}
+					})
 					.pre()
 				.pre()
 			.shellBuilder().build();

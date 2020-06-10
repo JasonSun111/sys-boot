@@ -208,6 +208,8 @@ public class Shell {
 				} else {
 					ShellState currentState = contextState.currentState();
 					if (canCallback) {
+						StringBuilder peek = queue.peekLast();
+						log.info(peek.toString());
 						ready = true;
 						Set<ShellStateType> set = currentState.type().nexts();
 						String str = String.join(lineSeparator, queue);

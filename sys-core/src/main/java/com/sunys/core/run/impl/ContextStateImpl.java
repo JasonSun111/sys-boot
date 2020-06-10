@@ -27,7 +27,7 @@ public class ContextStateImpl<T extends State<? extends StateType>> implements C
 	public <P> void change(StateEvent<P, T> event) {
 		T state = event.getState();
 		log.info("State change, {} -> {}", this.state.type().getName(), state.type().getName());
-		state.handle(event);
+		this.state.handle(event);
 		this.state = state;
 	}
 
