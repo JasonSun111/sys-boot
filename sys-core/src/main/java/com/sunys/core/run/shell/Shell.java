@@ -144,6 +144,11 @@ public class Shell {
 		return pid;
 	}
 	
+	public ShellState currentState() {
+		ShellState currentState = contextState.currentState();
+		return currentState;
+	}
+	
 	public synchronized void ready() throws InterruptedException {
 		while (!ready) {
 			log.info("try ready wait");
@@ -220,7 +225,7 @@ public class Shell {
 						Set<ShellStateType> set = currentState.type().nexts();
 						String str = String.join(LINE_SEPARATOR, queue);
 						for (ShellStateType type : set) {
-							if (type.match(str.toString())) {
+							if (type.match(str)) {
 								ShellState state = currentState.type().getState(type);
 								StateEvent<String, ShellState> event = new StateEventImpl<>(str, state, new StateEventType(type.getName()));
 								contextState.change(event);

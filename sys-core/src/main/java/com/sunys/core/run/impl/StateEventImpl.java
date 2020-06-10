@@ -33,4 +33,9 @@ public class StateEventImpl<P, T extends State<? extends StateType>> implements 
 		return state;
 	}
 
+	@Override
+	public String toString() {
+		return "StateEventImpl [state=" + state + ", type=" + type + "]";
+	}
+
 }

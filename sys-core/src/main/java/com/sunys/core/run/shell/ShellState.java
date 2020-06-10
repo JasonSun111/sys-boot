@@ -114,7 +114,7 @@ public class ShellState extends StateImpl<ShellStateType> {
 		public ShellStateBuilder addPre(int count, BiConsumer<Shell, String> consumer) {
 			ShellStateBuilder shellStateBuilder = this;
 			while (count > 0) {
-				shellStateBuilder = pre();
+				shellStateBuilder = shellStateBuilder.pre();
 				count--;
 			}
 			shellState.type().addState(shellStateBuilder.shellState.type(), shellStateBuilder.shellState);

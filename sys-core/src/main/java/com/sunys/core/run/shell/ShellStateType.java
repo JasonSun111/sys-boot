@@ -77,4 +77,9 @@ public class ShellStateType implements StateType {
 		boolean find = pattern.matcher(str).find();
 		return find;
 	}
+
+	@Override
+	public String toString() {
+		return "ShellStateType [name=" + name + ", pattern=" + pattern + "]";
+	}
 }
