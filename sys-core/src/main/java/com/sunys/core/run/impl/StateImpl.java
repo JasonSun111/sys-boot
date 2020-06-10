@@ -14,8 +14,15 @@ public class StateImpl<T extends StateType> implements State<T> {
 	private T type;
 	
 	public StateImpl(Subject subject, T type) {
+		if (subject == null) {
+			subject = new SubjectImpl();
+		}
 		this.subject = subject;
 		this.type = type;
+	}
+	
+	public StateImpl(T type) {
+		this(null, type);
 	}
 
 	@Override

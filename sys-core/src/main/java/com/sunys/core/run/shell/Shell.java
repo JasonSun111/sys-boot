@@ -2,7 +2,6 @@ package com.sunys.core.run.shell;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
@@ -22,13 +21,13 @@ import com.sunys.core.run.impl.StateEventType;
 import com.sunys.core.util.LimitQueue;
 import com.sunys.facade.run.ContextState;
 import com.sunys.facade.run.StateEvent;
+import com.sunys.facade.run.Subject;
 
 public class Shell {
 
 	private static final Logger log = LoggerFactory.getLogger(Shell.class);
 	
-	public static final String lineSeparator = System.setProperty("line.separator", "\n");
-	
+	public static final String LINE_SEPARATOR = System.setProperty("line.separator", "\n");
 	public static final String OS_NAME = System.getProperty("os.name");
 	
 	public static final String[] SHELL_LINUX = {"/bin/bash", "-c"};
@@ -53,7 +52,7 @@ public class Shell {
 	
 	private String[] stopCommand;
 
-	private int maxLine = 40;
+	private int maxLine = 20;
 	
 	private String encoding = DEFAULT_ENCODING;
 
@@ -96,7 +95,7 @@ public class Shell {
 	}
 	
 	public String start() {
-		log.info("Execute Start Command:{}", (Object) startCommand);
+		log.info("Start Shell:{}", (Object) startCommand);
 		ProcessBuilder processBuilder = new ProcessBuilder(startCommand);
 		processBuilder.redirectErrorStream(true);
 		try {
@@ -120,15 +119,19 @@ public class Shell {
 		}
 	}
 	
-	public void stop() throws IOException, InterruptedException {
-		String[] cmds = stopCommand;
-		if (cmds == null) {
-			cmds = new String[] {"/bin/bash", "-c", "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
+	public void stop() {
+		try {
+			String[] cmds = stopCommand;
+			if (cmds == null) {
+				cmds = new String[] {"/bin/bash", "-c", "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
+			}
+			ProcessBuilder processBuilder = new ProcessBuilder(cmds);
+			processBuilder.start();
+			log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
+			destoryForcibly();
+		} catch (Exception e) {
+			throw new ShellException(e);
 		}
-		ProcessBuilder processBuilder = new ProcessBuilder(cmds);
-		processBuilder.start();
-		log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
-		destoryForcibly();
 	}
 
 	private void destoryForcibly() throws InterruptedException {
@@ -141,23 +144,28 @@ public class Shell {
 		return pid;
 	}
 	
-	private synchronized void ready() throws InterruptedException {
+	public synchronized void ready() throws InterruptedException {
 		while (!ready) {
 			log.info("try ready wait");
 			wait();
 		}
 	}
 	
-	public synchronized void sendCommand(String... cmds) throws IOException, InterruptedException {
-		ready();
-		for (String cmd : cmds) {
-			log.info("send cmd:{}", cmd);
-			bw.write(cmd);
-			bw.newLine();
-			bw.flush();
+	public synchronized void sendCommand(String... cmds) {
+		try {
+			ready();
+			for (String cmd : cmds) {
+				log.info("send cmd:{}", cmd);
+				bw.write(cmd);
+				bw.newLine();
+				bw.flush();
+			}
+			ready = false;
+			notifyAll();
+		} catch (Exception e) {
+			String msg = String.join(",", cmds);
+			throw new ShellException(msg, e);
 		}
-		ready = false;
-		notifyAll();
 	}
 	
 	private String exec() throws Exception {
@@ -169,17 +177,17 @@ public class Shell {
 			while (true) {
 				if (br.ready()) {
 					ready = false;
-					char[] cb = new char[3];
+					char[] cb = new char[2];
 					int len = 0;
 					if ((len = br.read(cb)) != -1) {
 						canCallback = true;
 						ShellState currentState = contextState.currentState();
 						buf.append(cb, 0, len);
-						int lastIndexOf = buf.lastIndexOf(lineSeparator);
+						int lastIndexOf = buf.lastIndexOf(LINE_SEPARATOR);
 						if (lastIndexOf >= 0) {
 							String s1 = buf.substring(0, lastIndexOf);
-							String s2 = buf.substring(lastIndexOf + lineSeparator.length());
-							String[] arr = s1.split(lineSeparator);
+							String s2 = buf.substring(lastIndexOf + LINE_SEPARATOR.length());
+							String[] arr = s1.split(LINE_SEPARATOR);
 							queue.pollLast();
 							for (int i = 0; i < arr.length; i++) {
 								String str = arr[i];
@@ -190,7 +198,7 @@ public class Shell {
 								}
 								queue.offer(new StringBuilder(str));
 								if (needResult) {
-									sb.append(str).append(lineSeparator);
+									sb.append(str).append(LINE_SEPARATOR);
 								}
 							}
 							buf.delete(0, buf.length());
@@ -202,8 +210,6 @@ public class Shell {
 								peek.append(cb, 0, len);
 							}
 						}
-					} else {
-						break;
 					}
 				} else {
 					ShellState currentState = contextState.currentState();
@@ -212,7 +218,7 @@ public class Shell {
 						log.info(peek.toString());
 						ready = true;
 						Set<ShellStateType> set = currentState.type().nexts();
-						String str = String.join(lineSeparator, queue);
+						String str = String.join(LINE_SEPARATOR, queue);
 						for (ShellStateType type : set) {
 							if (type.match(str.toString())) {
 								ShellState state = currentState.type().getState(type);
@@ -242,7 +248,7 @@ public class Shell {
 			result = sb.toString().trim();
 			return result;
 		} finally {
-			log.info("Execute Stop Command:{}", (Object) startCommand);
+			log.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
 				resultConsumer.accept(result);
@@ -275,8 +281,8 @@ public class Shell {
 		
 		private ShellState.ShellStateBuilder shellStateBuilder = state();
 		
-		public Builder start(String... startCommand) {
-			shell.startCommand = startCommand;
+		public Builder start(String... cmds) {
+			shell.startCommand = cmds;
 			return this;
 		}
 		
@@ -284,8 +290,8 @@ public class Shell {
 			return start(new String[] {SHELL[0], SHELL[1], cmd});
 		}
 		
-		public Builder stop(String... stopCommand) {
-			shell.stopCommand = stopCommand;
+		public Builder stop(String... cmds) {
+			shell.stopCommand = cmds;
 			return this;
 		}
 		
@@ -293,9 +299,18 @@ public class Shell {
 			return stop(new String[] {SHELL[0], SHELL[1], cmd});
 		}
 		
-		public ShellState.ShellStateBuilder state(String name, Pattern pattern) {
-			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, name, pattern);
+		public ShellState.ShellStateBuilder state(ShellState shellState) {
+			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, shellState);
 			return shellStateBuilder;
+		}
+		
+		public ShellState.ShellStateBuilder state(String name, Pattern pattern, Subject subject) {
+			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, name, pattern, subject);
+			return shellStateBuilder;
+		}
+		
+		public ShellState.ShellStateBuilder state(String name, Pattern pattern) {
+			return state(name, pattern, null);
 		}
 		
 		public ShellState.ShellStateBuilder state() {
