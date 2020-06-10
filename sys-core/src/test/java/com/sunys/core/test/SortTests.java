@@ -33,12 +33,13 @@ public class SortTests {
 		}
 		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
 		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder.getShell(), ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
-		for (String cmd : list) {
+		for (int i = 1; i < list.size(); i++) {
+			String cmd = list.get(i);
 			shellStateBuilder = shellStateBuilder.add(cmd, ShellStateType.BIN_BASH_PATTERN).addHandler(cmd, (sh, str) -> {
 				sh.sendCommand(cmd);
 			}).next(cmd);
 		}
-		ShellState shellState = shellStateBuilder.build();
+		ShellState shellState = shellStateBuilder.pre().addHandler(list.get(list.size() - 1), (sh, str) -> sh.stop()).build();
 		
 		Shell shell = builder.state()
 			//登录成功
@@ -85,6 +86,7 @@ public class SortTests {
 				.pre()
 			.shellBuilder().build();
 		shell.start();
+		log.info(shell.result());
 	}
 	
 	@Test
