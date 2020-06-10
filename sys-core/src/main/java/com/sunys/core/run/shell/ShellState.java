@@ -100,6 +100,33 @@ public class ShellState extends StateImpl<ShellStateType> {
 			shellStateBuilderMap.put(shellStateBuilder.shellState.type().getName(), shellStateBuilder);
 		}
 		
+		public ShellStateBuilder addCurrent(BiConsumer<Shell, String> consumer) {
+			shellState.type().addState(shellState.type(), shellState);
+			EventHandler<?> eventHandler = new ShellReadyEventHandler(shell, consumer);
+			shellState.registEventHandler(new StateEventType(shellState.type().getName()), eventHandler);
+			return this;
+		}
+		
+		public ShellStateBuilder addCurrent() {
+			return addCurrent(null);
+		}
+		
+		public ShellStateBuilder addPre(int count, BiConsumer<Shell, String> consumer) {
+			ShellStateBuilder shellStateBuilder = this;
+			while (count > 0) {
+				shellStateBuilder = pre();
+				count--;
+			}
+			shellState.type().addState(shellStateBuilder.shellState.type(), shellStateBuilder.shellState);
+			EventHandler<?> eventHandler = new ShellReadyEventHandler(shell, consumer);
+			shellState.registEventHandler(new StateEventType(shellState.type().getName()), eventHandler);
+			return this;
+		}
+		
+		public ShellStateBuilder addPre(BiConsumer<Shell, String> consumer) {
+			return addPre(1, consumer);
+		}
+		
 		public ShellStateBuilder next(String name) {
 			ShellStateBuilder shellStateBuilder = shellStateBuilderMap.get(name);
 			return shellStateBuilder;

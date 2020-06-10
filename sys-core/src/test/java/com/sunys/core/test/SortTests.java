@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sunys.core.run.impl.StateEventType;
 import com.sunys.core.run.shell.Shell;
+import com.sunys.core.run.shell.ShellReadyEventHandler;
 import com.sunys.core.run.shell.ShellState;
 import com.sunys.core.run.shell.ShellStateType;
 import com.sunys.core.util.LimitQueue;
@@ -26,6 +29,93 @@ public class SortTests {
 	private static int replaceCount = 0;
 	
 	@Test
+	public void tel4() throws Exception {
+		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost").async(Executors.newFixedThreadPool(4));
+		Shell shell = builder.state()
+			//登录成功
+			.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
+			.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+			//输入用户名
+			.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+			.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+				.next(ShellStateType.INPUT_USERNAME_NAME)
+				//输入密码
+				.add(ShellStateType.INPUT_PASSWORD_NAME, ShellStateType.INPUT_PASSWORD_PATTERN)
+				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+					.next(ShellStateType.INPUT_PASSWORD_NAME)
+					//密码错误，退出
+					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
+					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					//登录成功
+					.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
+					.addHandler(ShellStateType.BIN_BASH_NAME, null)
+					.pre()
+				.pre()
+			.shellBuilder().build();
+		shell.start();
+		shell.sendCommand("pwd");
+		Thread.sleep(2421);
+		for (int i = 0; i < 10; i++) {
+			shell.sendCommand("echo " + i);
+		}
+		Thread.sleep(6347);
+		shell.sendCommand("ls -l /");
+		shell.stop();
+	}
+	
+	@Test
+	public void tel3() throws Exception {
+		List<String> list = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			list.add("echo " + i);
+		}
+		List<ShellState> shellStates = new ArrayList<>();
+		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
+		Shell s = builder.getShell();
+		ShellStateType type = new ShellStateType(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
+		ShellState shellState  = new ShellState(type);
+		for (int i = 1; i < list.size(); i++) {
+			String cmd = list.get(i);
+			ShellStateType shellStateType = new ShellStateType(cmd, ShellStateType.BIN_BASH_PATTERN);
+			ShellState cmdShellState = new ShellState(shellStateType);
+			cmdShellState.registEventHandler(new StateEventType(cmd), new ShellReadyEventHandler(s, (sh, str) -> sh.sendCommand(cmd)));
+			type.addState(shellStateType, cmdShellState);
+			shellState = cmdShellState;
+			shellStates.add(cmdShellState);
+		}
+		
+		Shell shell = builder.state()
+			//登录成功
+			.add(shellState)
+			.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+			//输入用户名
+			.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+			.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+				.next(ShellStateType.INPUT_USERNAME_NAME)
+				//输入密码
+				.add(ShellStateType.INPUT_PASSWORD_NAME, ShellStateType.INPUT_PASSWORD_PATTERN)
+				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
+					.next(ShellStateType.INPUT_PASSWORD_NAME)
+					//密码错误，退出
+					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
+					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					//登录成功
+					.add(shellState)
+					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> {
+//						sh.sendCommand("ls -l", "exit");
+						sh.sendCommand(list.get(0));
+					})
+					.pre()
+				.pre()
+			.shellBuilder().build();
+		shell.start();
+		log.info(shell.result());
+		for (ShellState ss : shellStates) {
+			log.info("ShellState result:{}", ss.result());
+		}
+	}
+	
+	@Test
 	public void tel2() throws Exception {
 		List<String> list = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
@@ -35,9 +125,7 @@ public class SortTests {
 		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder.getShell(), ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
 		for (int i = 1; i < list.size(); i++) {
 			String cmd = list.get(i);
-			shellStateBuilder = shellStateBuilder.add(cmd, ShellStateType.BIN_BASH_PATTERN).addHandler(cmd, (sh, str) -> {
-				sh.sendCommand(cmd);
-			}).next(cmd);
+			shellStateBuilder = shellStateBuilder.add(cmd, ShellStateType.BIN_BASH_PATTERN).addHandler(cmd, (sh, str) -> sh.sendCommand(cmd)).next(cmd);
 		}
 		ShellState shellState = shellStateBuilder.pre().addHandler(list.get(list.size() - 1), (sh, str) -> sh.stop()).build();
 		

@@ -1,8 +1,8 @@
 package com.sunys.core.run.impl;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +23,7 @@ public class SubjectImpl implements Subject {
 
 	private static final Logger log = LoggerFactory.getLogger(SubjectImpl.class);
 	
-	private Map<EventType, Set<EventHandler<?>>> eventHandlerMap = new HashMap<>();
+	private Map<EventType, Set<EventHandler<?>>> eventHandlerMap = new LinkedHashMap<>();
 	
 	@Override
 	public void registEventHandler(EventType type, EventHandler<?> eventHandler) {
@@ -55,6 +55,10 @@ public class SubjectImpl implements Subject {
 		EventType type = event.type();
 		log.info("Event process..., type:{}", type);
 		Set<EventHandler<?>> set = eventHandlerMap.get(type);
+		if (set == null) {
+			log.error("event type handler not find, event:{}", event);
+			return;
+		}
 		for (Iterator<EventHandler<?>> it = set.iterator(); it.hasNext();) {
 			EventHandler<P> eventHandler = (EventHandler<P>) it.next();
 			eventHandler.handle(event);

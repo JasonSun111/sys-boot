@@ -59,7 +59,7 @@ public class Shell {
 
 	private StringBuilder sb = new StringBuilder();
 	
-	private volatile boolean ready = true;
+	private volatile boolean ready;
 	
 	private String result;
 	
@@ -351,7 +351,7 @@ public class Shell {
 		public Shell build() {
 			if (shell.contextState == null) {
 				ShellState shellState = shellStateBuilder.build();
-				shell.contextState = new ContextStateImpl<ShellState>(shellState);
+				shell.contextState = new ContextStateImpl<>(shellState);
 			}
 			return shell;
 		}
