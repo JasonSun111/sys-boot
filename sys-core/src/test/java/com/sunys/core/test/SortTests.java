@@ -80,7 +80,7 @@ public class SortTests {
 		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
 		Shell s = builder.getShell();
 		ShellStateType type = new ShellStateType(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
-		ShellState shellState  = new ShellState(type);
+		ShellState shellState = new ShellState(type);
 		shellStates.add(shellState);
 		ShellState tmpShellState = shellState;
 		for (int i = 1; i < list.size(); i++) {

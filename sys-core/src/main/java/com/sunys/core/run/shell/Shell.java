@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
@@ -42,8 +41,8 @@ public class Shell {
 			SHELL = new String[] {SHELL_WINDOWS[0], SHELL_WINDOWS[1]};
 			DEFAULT_ENCODING = "gbk";
 		} else {
-			DEFAULT_ENCODING = "utf-8";
 			SHELL = new String[] {SHELL_LINUX[0], SHELL_LINUX[1]};
+			DEFAULT_ENCODING = "utf-8";
 		}
 	}
 	
@@ -64,8 +63,6 @@ public class Shell {
 	
 	private volatile boolean ready;
 	
-	private String result;
-	
 	private BiConsumer<Shell, String> lineConsumer;
 	
 	private BiConsumer<Shell, String> resultConsumer;
@@ -73,8 +70,6 @@ public class Shell {
 	private ContextState<ShellState> contextState;
 	
 	private ExecutorService executorService;
-	
-	private Future<?> future;
 	
 	private Process process;
 	
@@ -111,18 +106,18 @@ public class Shell {
 			bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), encoding));
 			if (contextState == null) {
 				if (async) {
-					future = executorService.submit(this::exec1);
+					executorService.submit(this::exec1);
 					return null;
 				}
 				exec1();
 			} else {
 				if (async) {
-					future = executorService.submit(this::exec2);
+					executorService.submit(this::exec2);
 					return null;
 				}
 				exec2();
 			}
-			return result;
+			return result();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -140,7 +135,7 @@ public class Shell {
 			log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
 			destoryForcibly();
 		} catch (Exception e) {
-			throw new ShellException(e);
+			log.info(e.getMessage(), e);
 		}
 	}
 
@@ -199,14 +194,14 @@ public class Shell {
 					lineConsumer.accept(this, line);
 				}
 			}
-			result = sb.toString().trim();
+			process.waitFor();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} finally {
 			log.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
-				resultConsumer.accept(this, result);
+				resultConsumer.accept(this, result());
 			}
 		}
 	}
@@ -235,13 +230,13 @@ public class Shell {
 							for (int i = 0; i < arr.length; i++) {
 								String str = arr[i];
 								log.info(str);
-								currentState.addLine(str);
-								if (lineConsumer != null) {
-									lineConsumer.accept(this, str);
-								}
 								queue.offer(new StringBuilder(str));
 								if (needResult) {
+									currentState.addLine(str);
 									sb.append(str).append(LINE_SEPARATOR);
+								}
+								if (lineConsumer != null) {
+									lineConsumer.accept(this, str);
 								}
 							}
 							buf.delete(0, buf.length());
@@ -274,11 +269,13 @@ public class Shell {
 					} else {
 						synchronized (this) {
 							if (!process.isAlive()) {
-								currentState.addLine(buf.toString());
+								if (needResult) {
+									currentState.addLine(buf.toString());
+									sb.append(buf.toString());
+								}
 								if (lineConsumer != null) {
 									lineConsumer.accept(this, buf.toString());
 								}
-								sb.append(buf.toString());
 								notifyAll();
 								break;
 							}
@@ -288,14 +285,13 @@ public class Shell {
 				}
 			}
 			process.waitFor();
-			result = sb.toString().trim();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} finally {
 			log.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
-				resultConsumer.accept(this, result);
+				resultConsumer.accept(this, result());
 			}
 		}
 	}
@@ -308,14 +304,13 @@ public class Shell {
 		return value;
 	}
 	
+	public String waitResult() throws InterruptedException {
+		process.waitFor();
+		return result();
+	}
+	
 	public String result() {
-		try {
-			if (future != null) {
-				future.get();
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+		String result = sb.toString().trim();
 		return result;
 	}
 	
