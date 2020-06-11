@@ -1,8 +1,8 @@
 package com.sunys.core.run.impl;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,13 +23,13 @@ public class SubjectImpl implements Subject {
 
 	private static final Logger log = LoggerFactory.getLogger(SubjectImpl.class);
 	
-	private Map<EventType, Set<EventHandler<?>>> eventHandlerMap = new LinkedHashMap<>();
+	private Map<EventType, Set<EventHandler<?>>> eventHandlerMap = new HashMap<>();
 	
 	@Override
 	public void registEventHandler(EventType type, EventHandler<?> eventHandler) {
 		Set<EventHandler<?>> set = eventHandlerMap.get(type);
 		if (set == null) {
-			set = new HashSet<>();
+			set = new LinkedHashSet<>();
 			eventHandlerMap.put(type, set);
 		}
 		set.add(eventHandler);

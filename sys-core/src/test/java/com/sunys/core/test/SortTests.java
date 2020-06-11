@@ -73,7 +73,7 @@ public class SortTests {
 	@Test
 	public void tel3() throws Exception {
 		List<String> list = new ArrayList<>();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			list.add("echo " + i);
 		}
 		List<ShellState> shellStates = new ArrayList<>();
@@ -81,24 +81,24 @@ public class SortTests {
 		Shell s = builder.getShell();
 		ShellStateType type = new ShellStateType(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
 		ShellState shellState  = new ShellState(type);
-		shellState.registEventHandler(new StateEventType(list.get(0)), new ShellReadyEventHandler(s, (sh, str) -> sh.sendCommand(list.get(1))));
-		ShellState cmdShellState = null;
-		ShellStateType shellStateType = null;
-		for (int i = 0; i < list.size()-1; i++) {
+		shellStates.add(shellState);
+		ShellState tmpShellState = shellState;
+		for (int i = 1; i < list.size(); i++) {
 			String cmd = list.get(i);
-			String nextCmd = list.get(i + 1);
-			shellStateType = new ShellStateType(cmd, ShellStateType.BIN_BASH_PATTERN);
-			cmdShellState = new ShellState(shellStateType);
-			cmdShellState.registEventHandler(new StateEventType(cmd), new ShellReadyEventHandler(s, (sh, str) -> sh.sendCommand(nextCmd)));
+			ShellStateType shellStateType = new ShellStateType(cmd, ShellStateType.BIN_BASH_PATTERN);
+			ShellState cmdShellState = new ShellState(shellStateType);
+			tmpShellState.registEventHandler(new StateEventType(cmd), new ShellReadyEventHandler(s, (sh, str) -> sh.sendCommand(cmd)));
 			type.addState(shellStateType, cmdShellState);
-			type = shellStateType;
 			shellStates.add(cmdShellState);
+			type = shellStateType;
+			tmpShellState = cmdShellState;
 		}
+		ShellStateType shellStateType = new ShellStateType("stop", ShellStateType.BIN_BASH_PATTERN);
+		ShellState stopState = new ShellState(shellStateType);
+		tmpShellState.registEventHandler(new StateEventType("stop"), new ShellReadyEventHandler(s, (sh, str) -> sh.stop()));
+		type.addState(shellStateType, stopState);
 		
 		Shell shell = builder.state()
-			//登录成功
-			.add(shellState)
-			.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand(list.get(0)))
 			//输入用户名
 			.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
 			.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.sendCommand("123"))
@@ -112,10 +112,7 @@ public class SortTests {
 					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
 					//登录成功
 					.add(shellState)
-					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> {
-//						sh.sendCommand("ls -l", "exit");
-						sh.sendCommand(list.get(0));
-					})
+					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand(list.get(0)))
 					.pre()
 				.pre()
 			.shellBuilder().build();
