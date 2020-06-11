@@ -9,7 +9,7 @@ import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -33,14 +33,17 @@ public class Shell {
 	public static final String[] SHELL_LINUX = {"/bin/bash", "-c"};
 	public static final String[] SHELL_WINDOWS = {"cmd.exe", "/c"};
 	
-	public static String DEFAULT_ENCODING = "utf-8";
+	public static final String DEFAULT_ENCODING;
 	
-	public static String[] SHELL = {SHELL_LINUX[0], SHELL_LINUX[1]};
+	public static final String[] SHELL;
 	
 	static {
 		if (OS_NAME.toLowerCase().startsWith("win")) {
 			SHELL = new String[] {SHELL_WINDOWS[0], SHELL_WINDOWS[1]};
 			DEFAULT_ENCODING = "gbk";
+		} else {
+			DEFAULT_ENCODING = "utf-8";
+			SHELL = new String[] {SHELL_LINUX[0], SHELL_LINUX[1]};
 		}
 	}
 	
@@ -63,15 +66,15 @@ public class Shell {
 	
 	private String result;
 	
-	private Consumer<String> lineConsumer;
+	private BiConsumer<Shell, String> lineConsumer;
 	
-	private Consumer<String> resultConsumer;
+	private BiConsumer<Shell, String> resultConsumer;
 	
 	private ContextState<ShellState> contextState;
 	
 	private ExecutorService executorService;
 	
-	private Future<String> future;
+	private Future<?> future;
 	
 	private Process process;
 	
@@ -84,7 +87,6 @@ public class Shell {
 	
 	public static Shell.Builder builder() {
 		Shell.Builder builder = new Shell.Builder();
-		builder.shell = new Shell();
 		return builder;
 	}
 	
@@ -107,11 +109,19 @@ public class Shell {
 				pid = field.getInt(process);
 			}
 			bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), encoding));
-			if (async) {
-				future = executorService.submit(this::exec);
-				return null;
+			if (contextState == null) {
+				if (async) {
+					future = executorService.submit(this::exec1);
+					return null;
+				}
+				exec1();
+			} else {
+				if (async) {
+					future = executorService.submit(this::exec2);
+					return null;
+				}
+				exec2();
 			}
-			String result = exec();
 			return result;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -145,6 +155,9 @@ public class Shell {
 	}
 	
 	public ShellState currentState() {
+		if (contextState == null) {
+			return null;
+		}
 		ShellState currentState = contextState.currentState();
 		return currentState;
 	}
@@ -173,7 +186,32 @@ public class Shell {
 		}
 	}
 	
-	private String exec() throws Exception {
+	private void exec1() {
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				log.info(line);
+				if (needResult) {
+					sb.append(line).append(LINE_SEPARATOR);
+				}
+				if (lineConsumer != null) {
+					lineConsumer.accept(this, line);
+				}
+			}
+			result = sb.toString().trim();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			log.info("End Shell:{}", (Object) startCommand);
+			process.destroyForcibly();
+			if (resultConsumer != null) {
+				resultConsumer.accept(this, result);
+			}
+		}
+	}
+	
+	private void exec2() {
 		try {
 			boolean canCallback = false;
 			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
@@ -182,7 +220,7 @@ public class Shell {
 			while (true) {
 				if (br.ready()) {
 					ready = false;
-					char[] cb = new char[2];
+					char[] cb = new char[2048];
 					int len = 0;
 					if ((len = br.read(cb)) != -1) {
 						canCallback = true;
@@ -199,7 +237,7 @@ public class Shell {
 								log.info(str);
 								currentState.addLine(str);
 								if (lineConsumer != null) {
-									lineConsumer.accept(str);
+									lineConsumer.accept(this, str);
 								}
 								queue.offer(new StringBuilder(str));
 								if (needResult) {
@@ -238,7 +276,7 @@ public class Shell {
 							if (!process.isAlive()) {
 								currentState.addLine(buf.toString());
 								if (lineConsumer != null) {
-									lineConsumer.accept(buf.toString());
+									lineConsumer.accept(this, buf.toString());
 								}
 								sb.append(buf.toString());
 								notifyAll();
@@ -251,12 +289,13 @@ public class Shell {
 			}
 			process.waitFor();
 			result = sb.toString().trim();
-			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 		} finally {
 			log.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
-				resultConsumer.accept(result);
+				resultConsumer.accept(this, result);
 			}
 		}
 	}
@@ -282,9 +321,9 @@ public class Shell {
 	
 	public static class Builder {
 		
-		private Shell shell;
+		private Shell shell = new Shell();
 		
-		private ShellState.ShellStateBuilder shellStateBuilder = state();
+		private ShellState.ShellStateBuilder shellStateBuilder;
 		
 		public Builder start(String... cmds) {
 			shell.startCommand = cmds;
@@ -322,12 +361,12 @@ public class Shell {
 			return state(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
 		}
 		
-		public Builder line(Consumer<String> consumer) {
+		public Builder line(BiConsumer<Shell, String> consumer) {
 			shell.lineConsumer = consumer;
 			return this;
 		}
 		
-		public Builder result(Consumer<String> consumer) {
+		public Builder result(BiConsumer<Shell, String> consumer) {
 			shell.resultConsumer = consumer;
 			return this;
 		}
@@ -354,7 +393,7 @@ public class Shell {
 		}
 		
 		public Shell build() {
-			if (shell.contextState == null) {
+			if (shellStateBuilder != null) {
 				ShellState shellState = shellStateBuilder.build();
 				shell.contextState = new ContextStateImpl<>(shellState);
 			}

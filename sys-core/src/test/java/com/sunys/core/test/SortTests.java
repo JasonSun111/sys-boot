@@ -200,7 +200,8 @@ public class SortTests {
 	
 	@Test
 	public void shell() throws Exception {
-		Shell.cmdRun("dir");
+		String result = Shell.cmdRun("dir");
+		log.info(result);
 		
 		ProcessBuilder b = new ProcessBuilder("cmd.exe", "/c", "dir");
 		Process start = b.start();
