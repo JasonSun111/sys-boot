@@ -22,5 +22,10 @@ public interface StateType {
 	 */
 	Set<? extends StateType> nexts();
 	
+	/**
+	 * 获取下一个status
+	 * @param type
+	 * @return
+	 */
 	State<? extends StateType> getState(StateType type);
 }

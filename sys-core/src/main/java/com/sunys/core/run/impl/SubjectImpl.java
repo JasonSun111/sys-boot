@@ -55,8 +55,8 @@ public class SubjectImpl implements Subject {
 		EventType type = event.type();
 		log.info("Event process..., type:{}", type);
 		Set<EventHandler<?>> set = eventHandlerMap.get(type);
-		if (set == null) {
-			log.error("event type handler not find, event:{}", event);
+		if (set == null || set.size() == 0) {
+			log.warn("event type handler not find, event:{}", event);
 			return;
 		}
 		for (Iterator<EventHandler<?>> it = set.iterator(); it.hasNext();) {

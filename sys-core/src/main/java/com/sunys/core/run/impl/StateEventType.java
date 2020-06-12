@@ -2,13 +2,15 @@ package com.sunys.core.run.impl;
 
 import com.sunys.facade.run.EventType;
 
+/**
+ * StateEventType
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class StateEventType implements EventType {
 
 	private String name;
 	
-	public StateEventType() {
-	}
-
 	public StateEventType(String name) {
 		this.name = name;
 	}

@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import com.sunys.facade.run.Event;
 import com.sunys.facade.run.EventHandler;
 
+/**
+ * ShellReadyEventHandler
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class ShellReadyEventHandler implements EventHandler<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(ShellReadyEventHandler.class);

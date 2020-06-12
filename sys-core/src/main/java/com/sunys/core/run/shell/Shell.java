@@ -22,6 +22,12 @@ import com.sunys.facade.run.ContextState;
 import com.sunys.facade.run.StateEvent;
 import com.sunys.facade.run.Subject;
 
+/**
+ * 执行命令
+ * Shell
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class Shell {
 
 	private static final Logger log = LoggerFactory.getLogger(Shell.class);
@@ -29,68 +35,96 @@ public class Shell {
 	public static final String LINE_SEPARATOR = System.setProperty("line.separator", "\n");
 	public static final String OS_NAME = System.getProperty("os.name");
 	
-	public static final String[] SHELL_LINUX = {"/bin/bash", "-c"};
-	public static final String[] SHELL_WINDOWS = {"cmd.exe", "/c"};
+	public static final String[] LINUX_SHELL = {"/bin/bash", "-c"};
+	public static final String[] WINDOWS_SHELL = {"cmd.exe", "/c"};
 	
 	public static final String DEFAULT_ENCODING;
 	
-	public static final String[] SHELL;
+	public static final String[] DEFAULT_SHELL;
 	
 	static {
 		if (OS_NAME.toLowerCase().startsWith("win")) {
-			SHELL = new String[] {SHELL_WINDOWS[0], SHELL_WINDOWS[1]};
+			DEFAULT_SHELL = new String[] {WINDOWS_SHELL[0], WINDOWS_SHELL[1]};
 			DEFAULT_ENCODING = "gbk";
 		} else {
-			SHELL = new String[] {SHELL_LINUX[0], SHELL_LINUX[1]};
+			DEFAULT_SHELL = new String[] {LINUX_SHELL[0], LINUX_SHELL[1]};
 			DEFAULT_ENCODING = "utf-8";
 		}
 	}
 	
+	//是否异步
 	private boolean async;
 	
+	//是否需要获取结果
 	private boolean needResult = true;
 	
+	//开始命令
 	private String[] startCommand;
 	
+	//停止命令
 	private String[] stopCommand;
 
+	//缓存行数
 	private int maxLine = 20;
 	
+	//编码方式
 	private String encoding = DEFAULT_ENCODING;
 
 
+	//命令结果
 	private StringBuilder sb = new StringBuilder();
 	
+	//判断是否为可交互状态
 	private volatile boolean ready;
 	
+	//读取到一行的处理器
 	private BiConsumer<Shell, String> lineConsumer;
 	
+	//读取到执行结果的处理器
 	private BiConsumer<Shell, String> resultConsumer;
 	
+	//保存shell的状态
 	private ContextState<ShellState> contextState;
 	
+	//如果为异步，需要用到线程池
 	private ExecutorService executorService;
 	
+	//当前process
 	private Process process;
 	
+	//进程id
 	private int pid = -1;
 	
+	//process的输出流
 	private BufferedWriter bw;
 	
 	private Shell() {
 	}
 	
+	/**
+	 * 获取shell创建器
+	 * @return
+	 */
 	public static Shell.Builder builder() {
 		Shell.Builder builder = new Shell.Builder();
 		return builder;
 	}
 	
+	/**
+	 * 执行命令返回结果
+	 * @param cmd
+	 * @return
+	 */
 	public static String cmdRun(String cmd) {
 		Shell shell = builder().cmdStart(cmd).build();
 		String result = shell.start();
 		return result;
 	}
 	
+	/**
+	 * 开始执行
+	 * @return
+	 */
 	public String start() {
 		log.info("Start Shell:{}", (Object) startCommand);
 		ProcessBuilder processBuilder = new ProcessBuilder(startCommand);
@@ -106,16 +140,16 @@ public class Shell {
 			bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), encoding));
 			if (contextState == null) {
 				if (async) {
-					executorService.submit(this::exec1);
+					executorService.submit(this::execLine);
 					return null;
 				}
-				exec1();
+				execLine();
 			} else {
 				if (async) {
-					executorService.submit(this::exec2);
+					executorService.submit(this::execChar);
 					return null;
 				}
-				exec2();
+				execChar();
 			}
 			return result();
 		} catch (Exception e) {
@@ -124,6 +158,9 @@ public class Shell {
 		}
 	}
 	
+	/**
+	 * 停止命令
+	 */
 	public void stop() {
 		try {
 			String[] cmds = stopCommand;
@@ -145,10 +182,18 @@ public class Shell {
 		process.waitFor();
 	}
 	
+	/**
+	 * 获取进程id
+	 * @return
+	 */
 	public int getPid() {
 		return pid;
 	}
 	
+	/**
+	 * 获取当前shell状态
+	 * @return
+	 */
 	public ShellState currentState() {
 		if (contextState == null) {
 			return null;
@@ -157,6 +202,10 @@ public class Shell {
 		return currentState;
 	}
 	
+	/**
+	 * 如果shell不是可以交互状态，等待
+	 * @throws InterruptedException
+	 */
 	public synchronized void ready() throws InterruptedException {
 		while (!ready) {
 			log.info("try ready wait");
@@ -164,6 +213,10 @@ public class Shell {
 		}
 	}
 	
+	/**
+	 * 发送命令，如果shell不是可以交互的状态，等待
+	 * @param cmds
+	 */
 	public synchronized void sendCommand(String... cmds) {
 		try {
 			ready();
@@ -181,7 +234,10 @@ public class Shell {
 		}
 	}
 	
-	private void exec1() {
+	/**
+	 * 执行命令读取行
+	 */
+	private void execLine() {
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
 			String line = null;
@@ -206,7 +262,10 @@ public class Shell {
 		}
 	}
 	
-	private void exec2() {
+	/**
+	 * 执行命令读取字符
+	 */
+	private void execChar() {
 		try {
 			boolean canCallback = false;
 			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
@@ -296,6 +355,10 @@ public class Shell {
 		}
 	}
 	
+	/**
+	 * 获取shell执行返回值
+	 * @return
+	 */
 	public int exitValue() {
 		int value = -1;
 		if (process != null) {
@@ -304,98 +367,203 @@ public class Shell {
 		return value;
 	}
 	
+	/**
+	 * 等待命令执行完成，返回执行结果
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public String waitResult() throws InterruptedException {
 		process.waitFor();
 		return result();
 	}
 	
+	/**
+	 * 获取执行结果
+	 * @return
+	 */
 	public String result() {
 		String result = sb.toString().trim();
 		return result;
 	}
 	
+	/**
+	 * Builder
+	 * @author sunys
+	 * @date Jun 11, 2020
+	 */
 	public static class Builder {
 		
 		private Shell shell = new Shell();
 		
 		private ShellState.ShellStateBuilder shellStateBuilder;
 		
+		/**
+		 * 设置开始命令
+		 * @param cmds
+		 * @return
+		 */
 		public Builder start(String... cmds) {
 			shell.startCommand = cmds;
 			return this;
 		}
 		
+		/**
+		 * 设置开始命令
+		 * @param cmd
+		 * @return
+		 */
 		public Builder cmdStart(String cmd) {
-			return start(new String[] {SHELL[0], SHELL[1], cmd});
+			return start(new String[] {DEFAULT_SHELL[0], DEFAULT_SHELL[1], cmd});
 		}
 		
+		/**
+		 * 设置停止命令
+		 * @param cmds
+		 * @return
+		 */
 		public Builder stop(String... cmds) {
 			shell.stopCommand = cmds;
 			return this;
 		}
 		
+		/**
+		 * 设置停止命令
+		 * @param cmd
+		 * @return
+		 */
 		public Builder cmdStop(String cmd) {
-			return stop(new String[] {SHELL[0], SHELL[1], cmd});
+			return stop(new String[] {DEFAULT_SHELL[0], DEFAULT_SHELL[1], cmd});
 		}
 		
+		/**
+		 * 设置ShellState
+		 * @param shellState
+		 * @return
+		 */
 		public ShellState.ShellStateBuilder state(ShellState shellState) {
 			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, shellState);
 			return shellStateBuilder;
 		}
 		
+		/**
+		 * 设置ShellState
+		 * @param name
+		 * @param pattern
+		 * @param subject
+		 * @return
+		 */
 		public ShellState.ShellStateBuilder state(String name, Pattern pattern, Subject subject) {
 			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, name, pattern, subject);
 			return shellStateBuilder;
 		}
 		
+		/**
+		 * 设置ShellState
+		 * @param name
+		 * @param pattern
+		 * @return
+		 */
 		public ShellState.ShellStateBuilder state(String name, Pattern pattern) {
 			return state(name, pattern, null);
 		}
 		
+		/**
+		 * 设置ShellState
+		 * @param shellStateParam
+		 * @return
+		 */
+		public ShellState.ShellStateBuilder state(ShellStateParam shellStateParam) {
+			this.shellStateBuilder = new ShellState.ShellStateBuilder(this, shellStateParam);
+			return shellStateBuilder;
+		}
+		
+		/**
+		 * 设置ShellState
+		 * @return
+		 */
 		public ShellState.ShellStateBuilder state() {
 			return state(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
 		}
 		
+		/**
+		 * 设置读取行处理器
+		 * @param consumer
+		 * @return
+		 */
 		public Builder line(BiConsumer<Shell, String> consumer) {
 			shell.lineConsumer = consumer;
 			return this;
 		}
 		
+		/**
+		 * 设置读取结果处理器
+		 * @param consumer
+		 * @return
+		 */
 		public Builder result(BiConsumer<Shell, String> consumer) {
 			shell.resultConsumer = consumer;
 			return this;
 		}
 		
+		/**
+		 * 设置为异步执行
+		 * @param executorService
+		 * @return
+		 */
 		public Builder async(ExecutorService executorService) {
 			shell.async = true;
 			shell.executorService = executorService;
 			return this;
 		}
 		
+		/**
+		 * 设置最大缓存行数
+		 * @param maxLine
+		 * @return
+		 */
 		public Builder maxLine(int maxLine) {
 			shell.maxLine = maxLine;
 			return this;
 		}
 		
+		/**
+		 * 设置是否需要获取执行结果
+		 * @param needResult
+		 * @return
+		 */
 		public Builder needResult(boolean needResult) {
 			shell.needResult = needResult;
 			return this;
 		}
 		
+		/**
+		 * 设置读取编码
+		 * @param encoding
+		 * @return
+		 */
 		public Builder encoding(String encoding) {
 			shell.encoding = encoding;
 			return this;
 		}
 		
+		/**
+		 * 创建
+		 * @return
+		 */
 		public Shell build() {
 			if (shellStateBuilder != null) {
+				//如果shellStateBuilder不为空，创建可交互的shell
 				ShellState shellState = shellStateBuilder.build();
 				shell.contextState = new ContextStateImpl<>(shellState);
 			}
 			return shell;
 		}
 		
-		public Shell getShell() {
+		/**
+		 * 查看shell
+		 * @return
+		 */
+		public Shell peek() {
 			return shell;
 		}
 	}

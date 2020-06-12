@@ -4,6 +4,11 @@ import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateEvent;
 import com.sunys.facade.run.StateType;
 
+/**
+ * StateEventImpl
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class StateEventImpl<P, T extends State<? extends StateType>> implements StateEvent<P, T> {
 
 	private P param;

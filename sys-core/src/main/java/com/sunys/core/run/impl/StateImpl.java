@@ -7,6 +7,11 @@ import com.sunys.facade.run.StateEvent;
 import com.sunys.facade.run.StateType;
 import com.sunys.facade.run.Subject;
 
+/**
+ * StateImpl
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class StateImpl<T extends StateType> implements State<T> {
 
 	private Subject subject;
@@ -47,9 +52,7 @@ public class StateImpl<T extends StateType> implements State<T> {
 
 	@Override
 	public <P> void handle(StateEvent<P, ? extends State<? extends StateType>> event) {
-		if (subject != null) {
-			subject.event(event);
-		}
+		subject.event(event);
 	}
 
 }

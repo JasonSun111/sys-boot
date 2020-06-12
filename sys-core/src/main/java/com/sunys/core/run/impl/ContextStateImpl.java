@@ -8,6 +8,11 @@ import com.sunys.facade.run.State;
 import com.sunys.facade.run.StateEvent;
 import com.sunys.facade.run.StateType;
 
+/**
+ * ContextStateImpl
+ * @author sunys
+ * @date Jun 11, 2020
+ */
 public class ContextStateImpl<T extends State<? extends StateType>> implements ContextState<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(ContextStateImpl.class);
