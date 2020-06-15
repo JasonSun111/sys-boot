@@ -163,13 +163,15 @@ public class Shell {
 	public void stop() {
 		try {
 			String[] cmds = stopCommand;
-			if (cmds == null) {
+			if (cmds == null && process.isAlive()) {
 				if (!OS_NAME.toLowerCase().startsWith("win")) {
 					cmds = new String[] {LINUX_SHELL[0], LINUX_SHELL[1], "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
-					ProcessBuilder processBuilder = new ProcessBuilder(cmds);
-					processBuilder.start();
-					log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
 				}
+			}
+			if (cmds != null) {
+				ProcessBuilder processBuilder = new ProcessBuilder(cmds);
+				processBuilder.start();
+				log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
 			}
 			destoryForcibly();
 		} catch (Exception e) {
