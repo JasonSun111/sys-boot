@@ -70,7 +70,6 @@ public class Shell {
 	//编码方式
 	private String encoding = DEFAULT_ENCODING;
 
-
 	//命令结果
 	private StringBuilder sb = new StringBuilder();
 	
@@ -165,11 +164,13 @@ public class Shell {
 		try {
 			String[] cmds = stopCommand;
 			if (cmds == null) {
-				cmds = new String[] {"/bin/bash", "-c", "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
+				if (!OS_NAME.toLowerCase().startsWith("win")) {
+					cmds = new String[] {LINUX_SHELL[0], LINUX_SHELL[1], "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
+					ProcessBuilder processBuilder = new ProcessBuilder(cmds);
+					processBuilder.start();
+					log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
+				}
 			}
-			ProcessBuilder processBuilder = new ProcessBuilder(cmds);
-			processBuilder.start();
-			log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
 			destoryForcibly();
 		} catch (Exception e) {
 			log.info(e.getMessage(), e);
@@ -312,7 +313,9 @@ public class Shell {
 					ShellState currentState = contextState.currentState();
 					if (canCallback) {
 						StringBuilder peek = queue.peekLast();
-						log.info(peek.toString());
+						if (peek != null) {
+							log.info(peek.toString());
+						}
 						ready = true;
 						Set<ShellStateType> set = currentState.type().nexts();
 						String str = String.join(LINE_SEPARATOR, queue);
