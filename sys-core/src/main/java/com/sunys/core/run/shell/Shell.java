@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -566,10 +567,10 @@ public class Shell {
 		
 		/**
 		 * 查看shell
-		 * @return
+		 * @param consumer
 		 */
-		public Shell peek() {
-			return shell;
+		public void peek(Consumer<Shell> consumer) {
+			consumer.accept(shell);
 		}
 	}
 

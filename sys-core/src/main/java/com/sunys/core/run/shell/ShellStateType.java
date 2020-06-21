@@ -21,8 +21,6 @@ public class ShellStateType implements StateType {
 	
 	public static final String INPUT_PASSWORD_NAME = "INPUT_PASSWORD";
 	
-	public static final String LOGIN_FAIL_NAME = "LOGIN_FAIL";
-	
 	public static final String CONFIRM_KEY_NAME = "CONFIRM_KEY";
 
 	//#
@@ -35,9 +33,6 @@ public class ShellStateType implements StateType {
 	
 	//password:
 	public static final Pattern INPUT_PASSWORD_PATTERN = Pattern.compile("(?i)password: ?$");
-	
-	//login incorrect
-	public static final Pattern LOGIN_FAIL_PATTERN = Pattern.compile("(?i)login incorrect\\n?");
 	
 	//continue connecting (yes/no)?
 	public static final Pattern CONFIRM_KEY_PATTERN = Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$");

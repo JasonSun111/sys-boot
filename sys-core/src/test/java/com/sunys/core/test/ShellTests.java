@@ -13,20 +13,23 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sunys.core.run.impl.StateEventType;
 import com.sunys.core.run.shell.Shell;
-import com.sunys.core.run.shell.ShellReadyEventHandler;
 import com.sunys.core.run.shell.ShellState;
 import com.sunys.core.run.shell.ShellStateParam;
 import com.sunys.core.run.shell.ShellStateType;
 import com.sunys.core.util.LimitQueue;
 
+/**
+ * ShellTests
+ * @author sunys
+ * @date Jun 21, 2020
+ */
 public class ShellTests {
 
 	private static final Logger log = LoggerFactory.getLogger(ShellTests.class);
 	
 	@Test
-	public void tel5() throws Exception {
+	public void tel4() throws Exception {
 		ExecutorService pool = Executors.newFixedThreadPool(4);
 		Shell shell = Shell.builder().cmdStart("telnet localhost").async(pool)
 			.state()
@@ -45,8 +48,8 @@ public class ShellTests {
 				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("123"))
 					.next(ShellStateType.INPUT_PASSWORD_NAME)
 					//密码错误，退出
-					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+					.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.stop())
 					//登录成功
 					.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
 					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand("echo -------pre-------"))
@@ -71,7 +74,7 @@ public class ShellTests {
 	
 
 	@Test
-	public void tel4() throws Exception {
+	public void tel3() throws Exception {
 		List<String> list = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			list.add("echo " + i);
@@ -82,7 +85,7 @@ public class ShellTests {
 			params.add(param);
 		}
 		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
-		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder.peek(), params.get(0));
+		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder, params.get(0));
 		for (int i = 1; i < list.size(); i++) {
 			String cmd = list.get(i);
 			ShellStateParam param = params.get(i);
@@ -103,8 +106,8 @@ public class ShellTests {
 				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("123"))
 					.next(ShellStateType.INPUT_PASSWORD_NAME)
 					//密码错误，退出
-					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+					.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.stop())
 					//登录成功
 					.add(shellState)
 					.addHandler(params.get(0).getName(), (sh, str) -> sh.sendCommand(list.get(0)))
@@ -120,66 +123,13 @@ public class ShellTests {
 	}
 	
 	@Test
-	public void tel3() throws Exception {
-		List<String> list = new ArrayList<>();
-		for (int i = 0; i < 5; i++) {
-			list.add("echo " + i);
-		}
-		List<ShellState> shellStates = new ArrayList<>();
-		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
-		Shell s = builder.peek();
-		ShellStateType type = new ShellStateType(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
-		ShellState shellState = new ShellState(type);
-		shellStates.add(shellState);
-		ShellState tmpShellState = shellState;
-		for (int i = 1; i < list.size(); i++) {
-			String cmd = list.get(i);
-			ShellStateType shellStateType = new ShellStateType(cmd, ShellStateType.BIN_BASH_PATTERN);
-			ShellState cmdShellState = new ShellState(shellStateType);
-			tmpShellState.registEventHandler(new StateEventType(cmd), new ShellReadyEventHandler(s, (sh, str) -> sh.sendCommand(cmd)));
-			type.addState(shellStateType, cmdShellState);
-			shellStates.add(cmdShellState);
-			type = shellStateType;
-			tmpShellState = cmdShellState;
-		}
-		ShellStateType shellStateType = new ShellStateType("stop", ShellStateType.BIN_BASH_PATTERN);
-		ShellState stopState = new ShellState(shellStateType);
-		tmpShellState.registEventHandler(new StateEventType("stop"), new ShellReadyEventHandler(s, (sh, str) -> sh.stop()));
-		type.addState(shellStateType, stopState);
-		
-		Shell shell = builder.state()
-			//输入用户名
-			.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
-			.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.sendCommand("123"))
-				.next(ShellStateType.INPUT_USERNAME_NAME)
-				//输入密码
-				.add(ShellStateType.INPUT_PASSWORD_NAME, ShellStateType.INPUT_PASSWORD_PATTERN)
-				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("123"))
-					.next(ShellStateType.INPUT_PASSWORD_NAME)
-					//密码错误，退出
-					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
-					//登录成功
-					.add(shellState)
-					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand(list.get(0)))
-					.pre()
-				.pre()
-			.shellBuilder().build();
-		shell.start();
-		log.info(shell.result());
-		for (ShellState ss : shellStates) {
-			log.info("ShellState result:{}", ss.result());
-		}
-	}
-	
-	@Test
 	public void tel2() throws Exception {
 		List<String> list = new ArrayList<>();
 		for (int i = 0; i < 6; i++) {
 			list.add("echo " + i);
 		}
 		Shell.Builder builder = Shell.builder().cmdStart("telnet localhost");
-		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder.peek(), ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
+		ShellState.ShellStateBuilder shellStateBuilder = new ShellState.ShellStateBuilder(builder, ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN);
 		for (int i = 1; i < list.size(); i++) {
 			String cmd = list.get(i);
 			shellStateBuilder = shellStateBuilder.add(cmd, ShellStateType.BIN_BASH_PATTERN).addHandler(cmd, (sh, str) -> {
@@ -201,8 +151,8 @@ public class ShellTests {
 				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("123"))
 					.next(ShellStateType.INPUT_PASSWORD_NAME)
 					//密码错误，退出
-					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+					.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.stop())
 					//登录成功
 					.add(shellState)
 					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand(list.get(0)))
@@ -231,8 +181,8 @@ public class ShellTests {
 				.addHandler(ShellStateType.INPUT_PASSWORD_NAME, (sh, str) -> sh.sendCommand("123"))
 					.next(ShellStateType.INPUT_PASSWORD_NAME)
 					//密码错误，退出
-					.add(ShellStateType.LOGIN_FAIL_NAME, ShellStateType.LOGIN_FAIL_PATTERN)
-					.addHandler(ShellStateType.LOGIN_FAIL_NAME, (sh, str) -> sh.stop())
+					.add(ShellStateType.INPUT_USERNAME_NAME, ShellStateType.INPUT_USERNAME_PATTERN)
+					.addHandler(ShellStateType.INPUT_USERNAME_NAME, (sh, str) -> sh.stop())
 					//登录成功
 					.add(ShellStateType.BIN_BASH_NAME, ShellStateType.BIN_BASH_PATTERN)
 					.addHandler(ShellStateType.BIN_BASH_NAME, (sh, str) -> sh.sendCommand("ls -l", "exit"))
