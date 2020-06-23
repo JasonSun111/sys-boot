@@ -166,7 +166,7 @@ public class Shell {
 			String[] cmds = stopCommand;
 			if (cmds == null && process.isAlive()) {
 				if (!OS_NAME.toLowerCase().startsWith("win")) {
-					cmds = new String[] {LINUX_SHELL[0], LINUX_SHELL[1], "ps -ef | grep " + pid + " | grep -v grep | awk '{print $2}' | xargs kill -9"};
+					cmds = new String[] {LINUX_SHELL[0], LINUX_SHELL[1], "ps -ef | awk '{print $2,$3}' | grep -P \"^(" + pid + " )|( " + pid + ")$\" | awk '{print $1}' | xargs kill -9"};
 				}
 			}
 			if (cmds != null) {
