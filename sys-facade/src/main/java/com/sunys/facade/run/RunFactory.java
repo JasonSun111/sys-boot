@@ -7,7 +7,7 @@ import com.sunys.facade.annotation.Factory;
  * @author sunys
  * @date Dec 21, 2019
  */
-public interface RunFactory<T extends Run, P> {
+public interface RunFactory<T, P> {
 
 	/**
 	 * 创建run接口对象
@@ -19,17 +19,16 @@ public interface RunFactory<T extends Run, P> {
 	
 	/**
 	 * 根据参数对象的注解调用不同的工厂类创建run接口对象
-	 * @param <R>
 	 * @param obj
 	 * @return
 	 * @throws Exception
 	 */
-	static <R extends Run> R getRun(Object obj) throws Exception {
+	static <R> R getRun(Object obj) throws Exception {
 		Factory anno = obj.getClass().getAnnotation(Factory.class);
 		String className = anno.value();
 		Class<?> clazz = Class.forName(className);
-		RunFactory<? extends Run, Object> runFactory = (RunFactory<? extends Run, Object>) clazz.newInstance();
-		R instance = (R) runFactory.getInstance(obj);
+		RunFactory<R, Object> runFactory = (RunFactory<R, Object>) clazz.newInstance();
+		R instance = runFactory.getInstance(obj);
 		return instance;
 	}
 }

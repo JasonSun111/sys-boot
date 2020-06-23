@@ -9,7 +9,7 @@ import java.util.function.Predicate;
  * @author sunys
  * @date Dec 21, 2019
  */
-public interface GroupRun<T extends Run> extends Run {
+public interface GroupRun<T> {
 
 	/**
 	 * 组里面包含的run对象
@@ -22,7 +22,7 @@ public interface GroupRun<T extends Run> extends Run {
 	 * @param clazz
 	 * @param list
 	 */
-	default void recursion(Class<? extends Run> clazz, List<Run> list) {
+	default void recursion(Class<? extends T> clazz, List<T> list) {
 		recursion(run -> clazz.isInstance(run), list);
 	}
 	
@@ -31,7 +31,7 @@ public interface GroupRun<T extends Run> extends Run {
 	 * @param predicate
 	 * @param list
 	 */
-	default void recursion(Predicate<Run> predicate, List<Run> list) {
+	default void recursion(Predicate<T> predicate, List<T> list) {
 		recursion(run -> {
 			if (predicate.test(run)) {
 				list.add(run);
@@ -43,12 +43,12 @@ public interface GroupRun<T extends Run> extends Run {
 	 * 递归整个组，调用consumer接口
 	 * @param consumer
 	 */
-	default void recursion(Consumer<Run> consumer) {
+	default void recursion(Consumer<T> consumer) {
 		Iterable<T> runs = getRuns();
 		for (T run : runs) {
 			consumer.accept(run);
 			if (run instanceof GroupRun) {
-				GroupRun<? extends Run> groupRun = (GroupRun) run;
+				GroupRun<T> groupRun = (GroupRun<T>) run;
 				groupRun.recursion(consumer);
 			}
 		}

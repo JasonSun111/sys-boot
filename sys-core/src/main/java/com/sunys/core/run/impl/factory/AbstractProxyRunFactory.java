@@ -13,7 +13,7 @@ import com.sunys.facade.run.ProxyRun;
  * @author sunys
  * @date Dec 21, 2019
  */
-public abstract class AbstractProxyRunFactory<T extends ProxyRun, P> implements RunFactory<T, P> {
+public abstract class AbstractProxyRunFactory<T, P> implements RunFactory<T, P> {
 
 	/**
 	 * 创建原始的run实现类对象
@@ -24,23 +24,26 @@ public abstract class AbstractProxyRunFactory<T extends ProxyRun, P> implements 
 	
 	@Override
 	public T getInstance(P param) throws Exception {
-		T run = createRun(param);
+		T target = createRun(param);
 		//创建当前对象的代理对象
-		T runProxy = getProxy(run);
-		//设置到当前对象中
-		run.setProxy(runProxy);
-		return runProxy;
+		T proxy = getProxy(target);
+		if (target instanceof ProxyRun) {
+			ProxyRun proxyRun = (ProxyRun) target;
+			//设置到当前对象中
+			proxyRun.setProxy((ProxyRun) proxy);
+		}
+		return proxy;
 	}
 
 	/**
 	 * 创建run接口对象的代理对象
-	 * @param run
+	 * @param target
 	 * @return
 	 * @throws Exception
 	 */
-	private T getProxy(T run) throws Exception {
-		Class<?> proxyClass = Proxy.getProxyClass(run.getClass().getClassLoader(), InterceptorAnnotationHandler.getAllInterfaceArray(run.getClass()));
-		InvocationHandler invocationHandler = new RunInvocationHandlerImpl(run);
+	private T getProxy(T target) throws Exception {
+		Class<?> proxyClass = Proxy.getProxyClass(target.getClass().getClassLoader(), InterceptorAnnotationHandler.getAllInterfaceArray(target.getClass()));
+		InvocationHandler invocationHandler = new RunInvocationHandlerImpl(target);
 		Constructor<?> constructor = proxyClass.getConstructor(InvocationHandler.class);
 		Object obj = constructor.newInstance(invocationHandler);
 		return (T) obj;

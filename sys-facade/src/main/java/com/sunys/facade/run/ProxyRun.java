@@ -5,7 +5,7 @@ package com.sunys.facade.run;
  * @author sunys
  * @date May 1, 2020
  */
-public interface ProxyRun extends Run {
+public interface ProxyRun {
 
 	/**
 	 * 获取当前对象的代理对象

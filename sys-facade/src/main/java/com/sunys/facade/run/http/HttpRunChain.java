@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunChain;
 import com.sunys.facade.run.RunMethodInterceptor;
 
@@ -18,11 +17,11 @@ public class HttpRunChain implements RunChain {
 	private ListIterator<RunMethodInterceptor> listIterator;
 
 	private HttpRun httpRun;
-	private Run proxy;
+	private Object proxy;
 	private Method method;
 	private Object[] args;
 
-	public HttpRunChain(List<RunMethodInterceptor> interceptors, HttpRun httpRun, Run proxy, Method method, Object... args) {
+	public HttpRunChain(List<RunMethodInterceptor> interceptors, HttpRun httpRun, Object proxy, Method method, Object... args) {
 		if (interceptors != null) {
 			this.listIterator = interceptors.listIterator();
 		}
@@ -51,12 +50,12 @@ public class HttpRunChain implements RunChain {
 	}
 
 	@Override
-	public Run getTarget() {
+	public Object getTarget() {
 		return null;
 	}
 
 	@Override
-	public Run getProxy() {
+	public Object getProxy() {
 		return proxy;
 	}
 

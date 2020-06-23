@@ -44,10 +44,4 @@ public class HttpRunImpl implements HttpRun {
 		return responseEntity;
 	}
 
-	@Override
-	public long getId() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

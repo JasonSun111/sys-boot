@@ -21,13 +21,13 @@ public interface RunChain {
 	 * 获取目标对象
 	 * @return
 	 */
-	Run getTarget();
+	Object getTarget();
 
 	/**
 	 * 获取代理对象
 	 * @return
 	 */
-	Run getProxy();
+	Object getProxy();
 
 	/**
 	 * 获取目标的方法

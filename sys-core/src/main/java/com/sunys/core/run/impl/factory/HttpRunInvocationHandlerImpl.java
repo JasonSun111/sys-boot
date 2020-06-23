@@ -7,7 +7,6 @@ import java.util.Map;
 import com.sunys.core.run.impl.factory.handle.AnnotationHandler;
 import com.sunys.core.run.impl.factory.handle.HttpAnnotationHandler;
 import com.sunys.core.run.impl.factory.handle.InterceptorAnnotationHandler;
-import com.sunys.facade.run.Run;
 import com.sunys.facade.run.RunChain;
 import com.sunys.facade.run.RunMethodInterceptor;
 import com.sunys.facade.run.http.HttpBuildParam;
@@ -41,7 +40,7 @@ public class HttpRunInvocationHandlerImpl implements HttpRunInvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		List<RunMethodInterceptor> interceptors = interceptorsMap.get(method);
 		//创建方法执行链
-		RunChain runChain = new HttpRunChain(interceptors, param.getHttpRun(), (Run) proxy, method, args);
+		RunChain runChain = new HttpRunChain(interceptors, param.getHttpRun(), proxy, method, args);
 		//执行拦截器和目标方法
 		Object obj = runChain.invoke();
 		return obj;

@@ -2,9 +2,7 @@ package com.sunys.facade.run.http;
 
 import java.lang.reflect.Type;
 
-import com.sunys.facade.run.Run;
-
-public interface HttpRun extends Run {
+public interface HttpRun {
 
 	<T> ResponseEntity<T> request(HttpMethod httpMethod, String url, HttpEntity<?> httpEntity, Type type);
 

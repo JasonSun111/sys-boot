@@ -13,16 +13,16 @@ public class RunChainImpl implements RunChain {
 
 	private ListIterator<RunMethodInterceptor> listIterator;
 
-	private Run run;
-	private Run proxy;
+	private Object target;
+	private Object proxy;
 	private Method method;
 	private Object[] args;
 
-	public RunChainImpl(List<RunMethodInterceptor> interceptors, Run run, Run proxy, Method method, Object... args) {
+	public RunChainImpl(List<RunMethodInterceptor> interceptors, Object target, Object proxy, Method method, Object... args) {
 		if (interceptors != null) {
 			this.listIterator = interceptors.listIterator();
 		}
-		this.run = run;
+		this.target = target;
 		this.proxy = proxy;
 		this.method = method;
 		this.args = args;
@@ -37,18 +37,18 @@ public class RunChainImpl implements RunChain {
 			obj = interceptor.intercept(this);
 		} else {
 			//如果没有拦截器，执行目标方法
-			obj = method.invoke(run, args);
+			obj = method.invoke(target, args);
 		}
 		return obj;
 	}
 
 	@Override
-	public Run getTarget() {
-		return run;
+	public Object getTarget() {
+		return target;
 	}
 
 	@Override
-	public Run getProxy() {
+	public Object getProxy() {
 		return proxy;
 	}
 

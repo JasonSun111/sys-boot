@@ -5,21 +5,21 @@ package com.sunys.facade.run;
  * @author sunys
  * @date May 1, 2020
  */
-public interface LinkedRun extends Run {
+public interface LinkedRun {
 
 	/**
 	 * 获取上级节点
 	 * @return
 	 */
-	GroupRun<Run> parent();
+	GroupRun<?> parent();
 	
 	/**
 	 * 获取指定类型的上级节点
 	 * @param clazz
 	 * @return
 	 */
-	default GroupRun<Run> parents(Class<? extends GroupRun<? extends Run>> clazz) {
-		GroupRun<Run> parent = parent();
+	default GroupRun<?> parents(Class<? extends GroupRun<?>> clazz) {
+		GroupRun<?> parent = parent();
 		if (clazz.isInstance(parent)) {
 			return parent;
 		} else {
