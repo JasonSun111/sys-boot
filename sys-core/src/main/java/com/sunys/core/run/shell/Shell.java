@@ -287,11 +287,11 @@ public class Shell {
 						int lastIndexOf = buf.lastIndexOf(LINE_SEPARATOR);
 						if (lastIndexOf >= 0) {
 							String s1 = buf.substring(0, lastIndexOf);
-							String s2 = buf.substring(lastIndexOf + LINE_SEPARATOR.length());
+							String s2 = buf.substring(lastIndexOf + LINE_SEPARATOR.length()).replace("\r", "");
 							String[] arr = s1.split(LINE_SEPARATOR);
 							queue.pollLast();
 							for (int i = 0; i < arr.length; i++) {
-								String str = arr[i];
+								String str = arr[i].replace("\r", "");
 								log.info(str);
 								queue.offer(new StringBuilder(str));
 								if (needResult) {
@@ -317,7 +317,8 @@ public class Shell {
 					if (canCallback) {
 						StringBuilder peek = queue.peekLast();
 						if (peek != null) {
-							log.info(peek.toString());
+							String str = peek.toString().replace("\r", "");
+							log.info(str);
 						}
 						ready = true;
 						Set<ShellStateType> set = currentState.type().nexts();
@@ -335,8 +336,9 @@ public class Shell {
 						synchronized (this) {
 							if (!process.isAlive()) {
 								if (needResult) {
-									currentState.addLine(buf.toString());
-									sb.append(buf.toString());
+									String str = buf.toString().replace("\r", "");
+									currentState.addLine(str);
+									sb.append(str);
 								}
 								if (lineConsumer != null) {
 									lineConsumer.accept(this, buf.toString());

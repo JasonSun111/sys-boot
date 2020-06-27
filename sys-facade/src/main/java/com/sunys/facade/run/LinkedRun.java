@@ -11,15 +11,15 @@ public interface LinkedRun {
 	 * 获取上级节点
 	 * @return
 	 */
-	GroupRun<?> parent();
+	Group<?> parent();
 	
 	/**
 	 * 获取指定类型的上级节点
 	 * @param clazz
 	 * @return
 	 */
-	default GroupRun<?> parents(Class<? extends GroupRun<?>> clazz) {
-		GroupRun<?> parent = parent();
+	default Group<?> parents(Class<? extends Group<?>> clazz) {
+		Group<?> parent = parent();
 		if (clazz.isInstance(parent)) {
 			return parent;
 		} else {

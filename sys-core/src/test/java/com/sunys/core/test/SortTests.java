@@ -1,7 +1,5 @@
 package com.sunys.core.test;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,27 +13,80 @@ public class SortTests {
 	private static int replaceCount = 0;
 	
 	@Test
-	public void quickSort() {
-		int[] arr = {1,2,3,4,5,6};
-		partition(arr, 0, arr.length - 1);
+	public void topK() {
+		int[] arr = {2, 6, 2, 7, 4, 3, 9, 6, 0, 5};
+		int k = 3;
+		int value = partition(arr, 0, arr.length - 1, k);
+		log.info("arr:{}, k:{}, value:{}", arr, k, value);
 	}
 	
+	private int partition(int[] arr, int start, int end, int k) {
+		int p = start;
+		if (start >= end) {
+			return arr[p];
+		}
+		for (int i = start; i < end; i++) {
+			if (compare(arr, i, end) > 0) {
+				replace(arr, i, p);
+				p++;
+			}
+		}
+		replace(arr, p, end);
+		if (p + 1 > k) {
+			return partition(arr, start, p - 1, k);
+		} else if (p + 1 < k) {
+			return partition(arr, p + 1, end, k);
+		}
+		return arr[p];
+	}
+	
+	@Test
+	public void quickSort() {
+//		int[] arr = {1,2,3,4,5,6};
+		int[] arr = {2, 6, 2, 7, 4, 3, 9, 6, 0, 5};
+		partition(arr, 0, arr.length - 1);
+		log.info("arr:{}", arr);
+	}
+	
+	/*
+	 *  2   6   2   7   4   3   9   6   0   5
+	 *[{2}] 6   2   7   4   3   9   6   0   5
+	 *  2 [{6}] 2   7   4   3   9   6   0   5
+	 *  2  {6} [2]  7   4   3   9   6   0   5
+	 *  2   2  {6} [7]  4   3   9   6   0   5
+	 *  2   2  {6}  7  [4]  3   9   6   0   5
+	 *  2   2   4  {7}  6  [3]  9   6   0   5
+	 *  2   2   4   3  {6}  7  [9]  6   0   5
+	 *  2   2   4   3  {6}  7   9  [6]  0   5
+	 *  2   2   4   3  {6}  7   9   6  [0]  5
+	 *  2   2   4   3   0  {7}  9   6   6  [5]
+	 *  2   2   4   3   0  {5}  9   6   6   7
+	 */
 	private void partition(int[] arr, int start, int end) {
 		if (start >= end) {
 			return;
 		}
-		int p = end;
-		for (int left = start, right = end - 1; left < right;) {
-			
+		//已排区间
+		int p = start;
+		for (int i = start; i < end; i++) {
+			//如果arr[i]大于分区点值
+			if (compare(arr, i, end) < 0) {
+				//交换元素已排分区点和当前元素
+				replace(arr, i, p);
+				//分区点向后移
+				p++;
+			}
 		}
-		
+		replace(arr, p, end);
+		partition(arr, start, p - 1);
+		partition(arr, p + 1, end);
 	}
 	
 	@Test
 	public void margeSort() {
 		int[] arr = {1,2,3,4,5,6};
 		margeSort(arr, 0, arr.length);
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private void margeSort(int[] arr, int start, int len) {
@@ -91,7 +142,7 @@ public class SortTests {
 		for (int i = 1; i < arr.length; i++) {
 			insertSort(arr, i);
 		}
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private void insertSort(int[] arr, int len) {
@@ -113,7 +164,7 @@ public class SortTests {
 		for (int i = 1; i < arr.length; i++) {
 			insertSort1(arr, i);
 		}
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private void insertSort1(int[] arr, int len) {
@@ -141,7 +192,7 @@ public class SortTests {
 		for (int i = 0; i < arr.length; i++) {
 			selectSort1(arr, i);
 		}
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private void selectSort1(int[] arr, int start) {
@@ -162,7 +213,7 @@ public class SortTests {
 		for (int i = 0; i < arr.length; i++) {
 			selectSort(arr, i);
 		}
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private void selectSort(int arr[], int start) {
@@ -182,7 +233,7 @@ public class SortTests {
 				break;
 			}
 		}
-		log.info(Arrays.toString(arr));
+		log.info("arr:{}", arr);
 	}
 	
 	private boolean bubbleSort(int[] arr, int end) {

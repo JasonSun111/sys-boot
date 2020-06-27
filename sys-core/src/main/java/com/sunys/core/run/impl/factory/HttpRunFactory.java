@@ -4,11 +4,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
-import com.sunys.facade.run.RunFactory;
+import com.sunys.facade.run.ObjectFactory;
 import com.sunys.facade.run.http.HttpBuildParam;
 import com.sunys.facade.run.http.HttpRun;
 
-public class HttpRunFactory<T extends HttpRun> implements RunFactory<T, HttpBuildParam> {
+public class HttpRunFactory<T extends HttpRun> implements ObjectFactory<T, HttpBuildParam> {
 
 	@Override
 	public T getInstance(HttpBuildParam param) throws Exception {

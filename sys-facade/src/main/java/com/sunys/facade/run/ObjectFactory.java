@@ -3,11 +3,11 @@ package com.sunys.facade.run;
 import com.sunys.facade.annotation.Factory;
 
 /**
- * RunFactory
+ * ObjectFactory
  * @author sunys
  * @date Dec 21, 2019
  */
-public interface RunFactory<T, P> {
+public interface ObjectFactory<T, P> {
 
 	/**
 	 * 创建run接口对象
@@ -27,8 +27,8 @@ public interface RunFactory<T, P> {
 		Factory anno = obj.getClass().getAnnotation(Factory.class);
 		String className = anno.value();
 		Class<?> clazz = Class.forName(className);
-		RunFactory<R, Object> runFactory = (RunFactory<R, Object>) clazz.newInstance();
-		R instance = runFactory.getInstance(obj);
+		ObjectFactory<R, Object> objectFactory = (ObjectFactory<R, Object>) clazz.newInstance();
+		R instance = objectFactory.getInstance(obj);
 		return instance;
 	}
 }

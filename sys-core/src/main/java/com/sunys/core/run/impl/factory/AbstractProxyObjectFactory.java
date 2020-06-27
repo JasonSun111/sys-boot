@@ -5,15 +5,15 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 import com.sunys.core.run.impl.factory.handle.InterceptorAnnotationHandler;
-import com.sunys.facade.run.RunFactory;
+import com.sunys.facade.run.ObjectFactory;
 import com.sunys.facade.run.ProxyRun;
 
 /**
- * AbstractProxyRunFactory
+ * AbstractProxyObjectFactory
  * @author sunys
  * @date Dec 21, 2019
  */
-public abstract class AbstractProxyRunFactory<T, P> implements RunFactory<T, P> {
+public abstract class AbstractProxyObjectFactory<T, P> implements ObjectFactory<T, P> {
 
 	/**
 	 * 创建原始的run实现类对象
