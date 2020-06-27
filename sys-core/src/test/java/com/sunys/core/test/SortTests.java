@@ -13,6 +13,29 @@ public class SortTests {
 	private static int replaceCount = 0;
 	
 	@Test
+	public void binarySearch() {
+		int[] arr = {0, 2, 2, 3, 4, 5, 6, 6, 7, 9};
+		int value = 7;
+		int index = binarySearch(arr, value);
+		log.info("arr:{}, index:{}, value:{}", arr, index, value);
+	}
+	
+	private int binarySearch(int[] arr, int value) {
+		int start = 0, end = arr.length -1;
+		while (start <= end) {
+			int m = (start + end) / 2;
+			if (value < arr[m]) {
+				end = m - 1;
+			} else if (value > arr[m]) {
+				start = m + 1;
+			} else {
+				return m;
+			}
+		}
+		return -1;
+	}
+	
+	@Test
 	public void topK() {
 		int[] arr = {2, 6, 2, 7, 4, 3, 9, 6, 0, 5};
 		int k = 3;
