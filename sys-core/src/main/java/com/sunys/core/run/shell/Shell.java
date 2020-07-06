@@ -59,6 +59,9 @@ public class Shell {
 	//是否需要获取结果
 	private boolean needResult = true;
 	
+	//日志
+	private Logger logger = log;
+	
 	//开始命令
 	private String[] startCommand;
 	
@@ -70,6 +73,7 @@ public class Shell {
 	
 	//编码方式
 	private String encoding = DEFAULT_ENCODING;
+
 
 	//命令结果
 	private StringBuilder sb = new StringBuilder();
@@ -126,7 +130,7 @@ public class Shell {
 	 * @return
 	 */
 	public String start() {
-		log.info("Start Shell:{}", (Object) startCommand);
+		logger.info("Start Shell:{}", (Object) startCommand);
 		ProcessBuilder processBuilder = new ProcessBuilder(startCommand);
 		processBuilder.redirectErrorStream(true);
 		try {
@@ -153,7 +157,7 @@ public class Shell {
 			}
 			return result();
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -172,16 +176,16 @@ public class Shell {
 			if (cmds != null) {
 				ProcessBuilder processBuilder = new ProcessBuilder(cmds);
 				processBuilder.start();
-				log.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
+				logger.info("Execute Kill Command:{}, shell:{}", cmds, startCommand);
 			}
 			destoryForcibly();
 		} catch (Exception e) {
-			log.info(e.getMessage(), e);
+			logger.info(e.getMessage(), e);
 		}
 	}
 
 	private void destoryForcibly() throws InterruptedException {
-		log.info("destroy process, shell:{}", (Object) startCommand);
+		logger.info("destroy process, shell:{}", (Object) startCommand);
 		process.destroyForcibly();
 		process.waitFor();
 	}
@@ -212,7 +216,7 @@ public class Shell {
 	 */
 	public synchronized void ready() throws InterruptedException {
 		while (!ready) {
-			log.info("try ready wait");
+			logger.info("try ready wait");
 			wait();
 		}
 	}
@@ -225,7 +229,7 @@ public class Shell {
 		try {
 			ready();
 			for (String cmd : cmds) {
-				log.info("send cmd:{}", cmd);
+				logger.info("send cmd:{}", cmd);
 				bw.write(cmd);
 				bw.newLine();
 				bw.flush();
@@ -246,7 +250,7 @@ public class Shell {
 			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				log.info(line);
+				logger.info(line);
 				if (needResult) {
 					sb.append(line).append(LINE_SEPARATOR);
 				}
@@ -256,9 +260,9 @@ public class Shell {
 			}
 			process.waitFor();
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		} finally {
-			log.info("End Shell:{}", (Object) startCommand);
+			logger.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
 				resultConsumer.accept(this, result());
@@ -292,7 +296,7 @@ public class Shell {
 							queue.pollLast();
 							for (int i = 0; i < arr.length; i++) {
 								String str = arr[i].replace("\r", "");
-								log.info(str);
+								logger.info(str);
 								queue.offer(new StringBuilder(str));
 								if (needResult) {
 									currentState.addLine(str);
@@ -317,8 +321,7 @@ public class Shell {
 					if (canCallback) {
 						StringBuilder peek = queue.peekLast();
 						if (peek != null) {
-							String str = peek.toString().replace("\r", "");
-							log.info(str);
+							logger.info(peek.toString().replace("\r", ""));
 						}
 						ready = true;
 						Set<ShellStateType> set = currentState.type().nexts();
@@ -353,9 +356,9 @@ public class Shell {
 			}
 			process.waitFor();
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		} finally {
-			log.info("End Shell:{}", (Object) startCommand);
+			logger.info("End Shell:{}", (Object) startCommand);
 			process.destroyForcibly();
 			if (resultConsumer != null) {
 				resultConsumer.accept(this, result());
@@ -551,6 +554,16 @@ public class Shell {
 		 */
 		public Builder encoding(String encoding) {
 			shell.encoding = encoding;
+			return this;
+		}
+		
+		/**
+		 * 设置打印日志
+		 * @param logger
+		 * @return
+		 */
+		public Builder logger(Logger logger) {
+			shell.logger = logger;
 			return this;
 		}
 		
