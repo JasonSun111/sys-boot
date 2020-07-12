@@ -346,6 +346,11 @@ public class Shell {
 								if (lineConsumer != null) {
 									lineConsumer.accept(this, buf.toString());
 								}
+								ShellState state = currentState.type().getState(ShellStateType.END_BASH);
+								if (state != null) {
+									StateEvent<String, ShellState> event = new StateEventImpl<>(buf.toString(), state, new StateEventType(ShellStateType.END_BASH.getName()));
+									contextState.change(event);
+								}
 								notifyAll();
 								break;
 							}

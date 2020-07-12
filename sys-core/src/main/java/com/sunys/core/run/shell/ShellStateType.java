@@ -17,6 +17,8 @@ public class ShellStateType implements StateType {
 
 	public static final String BIN_BASH_NAME = "BIN_BASH";
 	
+	public static final String END_BASH_NAME = "END_BASH";
+	
 	public static final String INPUT_USERNAME_NAME = "INPUT_USERNAME";
 	
 	public static final String INPUT_PASSWORD_NAME = "INPUT_PASSWORD";
@@ -37,6 +39,8 @@ public class ShellStateType implements StateType {
 	//continue connecting (yes/no)?
 	public static final Pattern CONFIRM_KEY_PATTERN = Pattern.compile("(?i)continue connecting ?\\(yes/no\\)\\? ?$");
 	
+	
+	public static final ShellStateType END_BASH = new ShellStateType(END_BASH_NAME, null);
 	
 	private Map<ShellStateType, ShellState> typeStateMap = new HashMap<>();
 	
@@ -69,6 +73,9 @@ public class ShellStateType implements StateType {
 	}
 	
 	public boolean match(String str) {
+		if (pattern == null) {
+			return false;
+		}
 		boolean find = pattern.matcher(str).find();
 		return find;
 	}
