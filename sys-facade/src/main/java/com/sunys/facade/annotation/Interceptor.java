@@ -5,13 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.sunys.facade.run.RunMethodInterceptor;
+import com.sunys.facade.run.MethodInterceptor;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Interceptor {
 
-	Class<? extends RunMethodInterceptor>[] value() default {};
+	Class<? extends MethodInterceptor>[] value() default {};
 	
 	String[] classNames() default {};
 }

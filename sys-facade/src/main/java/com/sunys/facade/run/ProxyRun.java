@@ -8,12 +8,6 @@ package com.sunys.facade.run;
 public interface ProxyRun {
 
 	/**
-	 * 获取当前对象的代理对象
-	 * @return
-	 */
-	ProxyRun getProxy();
-	
-	/**
 	 * 设置当前对象的代理对象
 	 * @param proxy
 	 */

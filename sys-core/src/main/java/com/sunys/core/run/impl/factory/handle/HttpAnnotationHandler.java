@@ -1,7 +1,12 @@
 package com.sunys.core.run.impl.factory.handle;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
 import com.sunys.facade.annotation.http.Header;
 import com.sunys.facade.annotation.http.HttpConfiguration;
+import com.sunys.facade.run.MethodInterceptor;
 import com.sunys.facade.run.http.HttpRunInvocationHandler;
 
 public class HttpAnnotationHandler implements AnnotationHandler {
@@ -13,7 +18,7 @@ public class HttpAnnotationHandler implements AnnotationHandler {
 	}
 
 	@Override
-	public void handle(Class<?> clazz) throws Exception {
+	public Map<Method, List<MethodInterceptor>> handle(Class<?> clazz) throws Exception {
 		HttpConfiguration httpConfiguration = clazz.getAnnotation(HttpConfiguration.class);
 		String rootUrl = httpConfiguration.rootUrl();
 		String contextPath = httpConfiguration.contextPath();
@@ -24,6 +29,7 @@ public class HttpAnnotationHandler implements AnnotationHandler {
 			boolean isSet = header.set();
 			
 		}
+		return null;
 	}
 
 }

@@ -2,11 +2,11 @@ package com.sunys.facade.run;
 
 /**
  * 方法拦截器
- * RunMethodInterceptor
+ * MethodInterceptor
  * @author sunys
  * @date Dec 21, 2019
  */
-public interface RunMethodInterceptor {
+public interface MethodInterceptor {
 
 	/**
 	 * 控制目标方法是否执行

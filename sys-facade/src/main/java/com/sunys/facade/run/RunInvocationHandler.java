@@ -16,6 +16,6 @@ public interface RunInvocationHandler extends InvocationHandler {
 	 * 设置拦截器map
 	 * @param interceptorsMap
 	 */
-	void setInterceptorsMap(Map<Method, List<RunMethodInterceptor>> interceptorsMap);
+//	void setInterceptorsMap(Map<Method, List<MethodInterceptor>> interceptorsMap);
 
 }

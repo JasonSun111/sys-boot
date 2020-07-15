@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sunys.facade.annotation.Interceptor;
-import com.sunys.facade.run.RunInvocationHandler;
-import com.sunys.facade.run.RunMethodInterceptor;
+import com.sunys.facade.run.MethodInterceptor;
+import com.sunys.facade.run.ObjectFactory;
 
 /**
  * 处理Interceptor注解
@@ -22,15 +22,15 @@ import com.sunys.facade.run.RunMethodInterceptor;
  */
 public class InterceptorAnnotationHandler implements AnnotationHandler {
 
-	private RunInvocationHandler invocationHandler;
-
-	public InterceptorAnnotationHandler(RunInvocationHandler invocationHandler) {
-		this.invocationHandler = invocationHandler;
+	private ObjectFactory<MethodInterceptor, Class<? extends MethodInterceptor>> interceptorFactory;
+	
+	public InterceptorAnnotationHandler(ObjectFactory<MethodInterceptor, Class<? extends MethodInterceptor>> interceptorFactory) {
+		this.interceptorFactory = interceptorFactory;
 	}
 
 	@Override
-	public void handle(Class<?> clazz) throws Exception {
-		Map<Method, List<RunMethodInterceptor>> interceptorsMap = new HashMap<>();
+	public Map<Method, List<MethodInterceptor>> handle(Class<?> clazz) throws Exception {
+		Map<Method, List<MethodInterceptor>> interceptorsMap = new HashMap<>();
 		//获取对象所有方法
 		Iterator<Method> it = getAllInterfaceSet(clazz).stream().flatMap(inter -> Arrays.stream(inter.getMethods())).iterator();
 		while (it.hasNext()) {
@@ -38,27 +38,27 @@ public class InterceptorAnnotationHandler implements AnnotationHandler {
 			method.setAccessible(true);
 			//获取方法上的Interceptor注解
 			Interceptor anno = method.getAnnotation(Interceptor.class);
-			List<RunMethodInterceptor> interceptors = new ArrayList<>();
+			List<MethodInterceptor> interceptors = new ArrayList<>();
 			if (anno != null) {
 				//获取注解上的拦截器类型
-				Class<? extends RunMethodInterceptor>[] value = anno.value();
-				for (Class<? extends RunMethodInterceptor> interceptorClazz : value) {
+				Class<? extends MethodInterceptor>[] value = anno.value();
+				for (Class<? extends MethodInterceptor> interceptorClazz : value) {
 					//创建方法拦截器对象
-					RunMethodInterceptor interceptor = interceptorClazz.newInstance();
+					MethodInterceptor interceptor = interceptorFactory.getInstance(interceptorClazz);
 					interceptors.add(interceptor);
 				}
 				//获取拦截器类名
 				String[] classNames = anno.classNames();
 				for (String className : classNames) {
 					//根据类名创建方法拦截器对象
-					Class<?> interceptorClazz = Class.forName(className);
-					RunMethodInterceptor interceptor = (RunMethodInterceptor) interceptorClazz.newInstance();
+					Class<? extends MethodInterceptor> interceptorClazz = (Class<? extends MethodInterceptor>) Class.forName(className);
+					MethodInterceptor interceptor = interceptorFactory.getInstance(interceptorClazz);
 					interceptors.add(interceptor);
 				}
 			}
 			interceptorsMap.put(method, interceptors);
 		}
-		invocationHandler.setInterceptorsMap(interceptorsMap);
+		return interceptorsMap;
 	}
 
 	/**

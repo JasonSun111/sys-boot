@@ -11,14 +11,14 @@ import java.util.ListIterator;
  */
 public class RunChainImpl implements RunChain {
 
-	private ListIterator<RunMethodInterceptor> listIterator;
+	private ListIterator<MethodInterceptor> listIterator;
 
 	private Object target;
 	private Object proxy;
 	private Method method;
 	private Object[] args;
 
-	public RunChainImpl(List<RunMethodInterceptor> interceptors, Object target, Object proxy, Method method, Object... args) {
+	public RunChainImpl(List<MethodInterceptor> interceptors, Object target, Object proxy, Method method, Object... args) {
 		if (interceptors != null) {
 			this.listIterator = interceptors.listIterator();
 		}
@@ -33,7 +33,7 @@ public class RunChainImpl implements RunChain {
 		Object obj = null;
 		if (listIterator != null && listIterator.hasNext()) {
 			//如果有拦截器，先执行拦截器
-			RunMethodInterceptor interceptor = listIterator.next();
+			MethodInterceptor interceptor = listIterator.next();
 			obj = interceptor.intercept(this);
 		} else {
 			//如果没有拦截器，执行目标方法

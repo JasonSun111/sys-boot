@@ -2,14 +2,14 @@ package com.sunys.core.run.impl.interceptor;
 
 import com.sunys.core.run.RunContext;
 import com.sunys.facade.run.RunChain;
-import com.sunys.facade.run.RunMethodInterceptor;
+import com.sunys.facade.run.MethodInterceptor;
 
 /**
- * ContextRunMethodInterceptor
+ * ContextMethodInterceptor
  * @author sunys
  * @date Dec 21, 2019
  */
-public class ContextRunMethodInterceptor implements RunMethodInterceptor {
+public class ContextMethodInterceptor implements MethodInterceptor {
 
 	@Override
 	public Object intercept(RunChain runChain) throws Exception {

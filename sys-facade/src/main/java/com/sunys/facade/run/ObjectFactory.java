@@ -15,7 +15,7 @@ public interface ObjectFactory<T, P> {
 	 * @return
 	 * @throws Exception
 	 */
-	T getInstance(P param) throws Exception;
+	T getInstance(P param);
 	
 	/**
 	 * 根据参数对象的注解调用不同的工厂类创建run接口对象

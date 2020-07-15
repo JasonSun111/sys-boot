@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.sunys.facade.run.RunChain;
-import com.sunys.facade.run.RunMethodInterceptor;
+import com.sunys.facade.run.MethodInterceptor;
 
 /**
  * HttpRunChain
@@ -14,14 +14,14 @@ import com.sunys.facade.run.RunMethodInterceptor;
  */
 public class HttpRunChain implements RunChain {
 
-	private ListIterator<RunMethodInterceptor> listIterator;
+	private ListIterator<MethodInterceptor> listIterator;
 
 	private HttpRun httpRun;
 	private Object proxy;
 	private Method method;
 	private Object[] args;
 
-	public HttpRunChain(List<RunMethodInterceptor> interceptors, HttpRun httpRun, Object proxy, Method method, Object... args) {
+	public HttpRunChain(List<MethodInterceptor> interceptors, HttpRun httpRun, Object proxy, Method method, Object... args) {
 		if (interceptors != null) {
 			this.listIterator = interceptors.listIterator();
 		}
@@ -36,7 +36,7 @@ public class HttpRunChain implements RunChain {
 		Object obj = null;
 		if (listIterator != null && listIterator.hasNext()) {
 			//如果有拦截器，先执行拦截器
-			RunMethodInterceptor interceptor = listIterator.next();
+			MethodInterceptor interceptor = listIterator.next();
 			obj = interceptor.intercept(this);
 		} else {
 			//如果没有拦截器，执行目标方法
