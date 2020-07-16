@@ -28,18 +28,30 @@ public interface Group<T> {
 			}
 		});
 	}
-	
+
 	/**
-	 * 递归整个组，调用consumer接口
+	 * 递归整个组
 	 * @param consumer
 	 */
 	default void recursion(Consumer<Object> consumer) {
-		Iterable<T> runs = iterable();
-		for (T run : runs) {
-			consumer.accept(run);
-			if (run instanceof Group) {
-				Group<T> groupRun = (Group<T>) run;
-				groupRun.recursion(consumer);
+		consumer.accept(this);
+		recursionSub(consumer);
+	}
+	
+	/**
+	 * 递归组下面的元素
+	 * @param consumer
+	 */
+	default void recursionSub(Consumer<Object> consumer) {
+		Iterable<? extends T> domains = iterable();
+		if (domains == null) {
+			return;
+		}
+		for (T obj : domains) {
+			consumer.accept(obj);
+			if (obj instanceof Group) {
+				Group<?> group = (Group<?>) obj;
+				group.recursion(consumer);
 			}
 		}
 	}

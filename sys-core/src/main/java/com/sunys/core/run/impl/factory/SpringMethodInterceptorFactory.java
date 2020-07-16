@@ -27,11 +27,13 @@ public class SpringMethodInterceptorFactory implements ObjectFactory<MethodInter
 			MethodInterceptor methodInterceptor = param.newInstance();
 			for (PropertyDescriptor pd : pds) {
 				String name = pd.getName();
-				Object bean = applicationContext.getBean(name);
 				//获取set方法
 				Method writeMethod = pd.getWriteMethod();
-				//设置属性
-				writeMethod.invoke(methodInterceptor, bean);
+				if (writeMethod != null) {
+					Object bean = applicationContext.getBean(name);
+					//设置属性
+					writeMethod.invoke(methodInterceptor, bean);
+				}
 			}
 			return methodInterceptor;
 		} catch (Exception e) {
