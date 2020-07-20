@@ -16,18 +16,33 @@ import com.sunys.facade.run.Subject;
  */
 public class LockSubject implements Subject {
 
-	private ReadWriteLock rwlock = new ReentrantReadWriteLock();
-	private Lock rlock = rwlock.readLock();
-	private Lock wlock = rwlock.writeLock();
+	private Lock rlock;
+	private Lock wlock;
 	
 	private Subject subject;
 	
-	public LockSubject(Subject subject) {
+	public LockSubject(ReadWriteLock rwlock, Subject subject) {
+		if (rwlock == null) {
+			rwlock = new ReentrantReadWriteLock();
+		}
+		if (subject == null) {
+			subject = new SubjectImpl();
+		}
+		this.rlock = rwlock.readLock();
+		this.wlock = rwlock.writeLock();
 		this.subject = subject;
 	}
-
+	
+	public LockSubject(Subject subject) {
+		this(null, subject);
+	}
+	
+	public LockSubject(ReadWriteLock rwlock) {
+		this(rwlock, null);
+	}
+	
 	public LockSubject() {
-		subject = new SubjectImpl();
+		this(null, null);
 	}
 
 	@Override
