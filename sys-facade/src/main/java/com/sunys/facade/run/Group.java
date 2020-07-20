@@ -1,5 +1,6 @@
 package com.sunys.facade.run;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
 public interface Group<T> {
 
 	/**
-	 * 组里面包含的run对象
+	 * 组里面包含的对象
 	 * @return
 	 */
 	Iterable<T> iterable();
@@ -22,7 +23,7 @@ public interface Group<T> {
 	 * @param list
 	 */
 	default <E> void recursion(Class<? extends E> clazz, List<E> list) {
-		recursion(obj -> {
+		dfs(obj -> {
 			if (clazz.isInstance(obj)) {
 				list.add((E) obj);
 			}
@@ -30,19 +31,19 @@ public interface Group<T> {
 	}
 
 	/**
-	 * 递归整个组
+	 * 深度优先，递归整个组
 	 * @param consumer
 	 */
-	default void recursion(Consumer<Object> consumer) {
+	default void dfs(Consumer<Object> consumer) {
 		consumer.accept(this);
-		recursionSub(consumer);
+		dfsSub(consumer);
 	}
 	
 	/**
-	 * 递归组下面的元素
+	 * 深度优先，递归组下面的元素
 	 * @param consumer
 	 */
-	default void recursionSub(Consumer<Object> consumer) {
+	default void dfsSub(Consumer<Object> consumer) {
 		Iterable<? extends T> domains = iterable();
 		if (domains == null) {
 			return;
@@ -51,9 +52,42 @@ public interface Group<T> {
 			consumer.accept(obj);
 			if (obj instanceof Group) {
 				Group<?> group = (Group<?>) obj;
-				group.recursion(consumer);
+				group.dfsSub(consumer);
 			}
 		}
+	}
+	
+	/**
+	 * 广度优先，递归整个组
+	 * @param consumer
+	 */
+	default void bfs(Consumer<Object> consumer) {
+		consumer.accept(this);
+		List<Group<?>> groups = new ArrayList<>();
+		groups.add(this);
+		bfsSub(consumer, groups);
+	}
+	
+	/**
+	 * 广度优先，递归组下面的元素
+	 * @param consumer
+	 * @param list
+	 */
+	default void bfsSub(Consumer<Object> consumer, List<Group<?>> list) {
+		List<Group<?>> groups = new ArrayList<>();
+		for (Group<?> group : list) {
+			Iterable<?> domains = group.iterable();
+			if (domains == null) {
+				continue;
+			}
+			for (Object obj : domains) {
+				consumer.accept(obj);
+				if (obj instanceof Group) {
+					groups.add((Group<?>) obj);
+				}
+			}
+		}
+		bfsSub(consumer, groups);
 	}
 
 }
