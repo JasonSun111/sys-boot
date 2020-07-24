@@ -279,8 +279,10 @@ public class Shell {
 			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), encoding));
 			Deque<StringBuilder> queue = new LimitQueue<>(maxLine);
 			StringBuilder buf = new StringBuilder();
+			int n = 1;
 			while (true) {
 				if (br.ready()) {
+					n = 1;
 					ready = false;
 					char[] cb = new char[2048];
 					int len = 0;
@@ -354,7 +356,11 @@ public class Shell {
 								notifyAll();
 								break;
 							}
-							wait(1000);
+							//等待2^n
+							wait(n);
+							if (n < 1024) {
+								n <<= 1;
+							}
 						}
 					}
 				}
